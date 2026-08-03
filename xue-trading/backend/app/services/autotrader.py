@@ -130,6 +130,10 @@ class AutoTrader:
         self.state.last_reason = decision.rationale
         self.state.last_technique = decision.technique
         self.state.last_technique_name = decision.technique_name
+        log.info(
+            "MEETING → decision=%s | technique=%s | confidence=%.0f%%",
+            decision.decision, decision.technique_name, decision.confidence,
+        )
         await self._broadcast("meeting", decision.model_dump())
 
         if self.state.halted_reason:
@@ -167,7 +171,8 @@ class AutoTrader:
             await self._broadcast("risk", {"approved": False, "reason": rd.reason})
             return
 
-        result = client.open_order(self._symbol, side, rd.lots, round(sl, 2), round(tp, 2))
+        comment = f"XUE-{technique}"[:28] if technique else "XUE-AI"
+        result = client.open_order(self._symbol, side, rd.lots, round(sl, 2), round(tp, 2), comment=comment)
         if result.ok:
             self.state.trades_today += 1
             self._open_trades[result.ticket] = {"tech": technique, "pnl": 0.0}
