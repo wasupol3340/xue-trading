@@ -4,7 +4,7 @@ import { Briefcase, TrendingUp } from "lucide-react";
 import { useTradingStore } from "@/store/useTradingStore";
 import { RadialProgress } from "@/components/ui/RadialProgress";
 import { RiskMeter } from "@/components/ui/Meter";
-import { fmtMoney, fmtPct } from "@/lib/utils";
+import { fmtMoney, fmtPct, fmtSignedMoney, signCls } from "@/lib/utils";
 import { Panel } from "@/components/ui/Panel";
 
 export function PortfolioPanel() {
@@ -18,7 +18,7 @@ export function PortfolioPanel() {
           <div className="flex-1 space-y-2.5">
             <Row label="Balance" value={fmtMoney(p.balance)} />
             <Row label="Equity" value={fmtMoney(p.equity)} />
-            <Row label="Profit" value={`${fmtMoney(p.profit)} (${p.profitPct}%)`} className="text-up" />
+            <Row label="Profit" value={`${fmtSignedMoney(p.profit)} (${fmtPct(p.profitPct)})`} className={signCls(p.profit)} />
             <Row label="Drawdown" value={fmtPct(-p.drawdown)} className="text-down" />
           </div>
         </div>
@@ -37,7 +37,7 @@ export function PortfolioPanel() {
             <TrendingUp className="h-4 w-4" />
             <span className="text-[11px] font-semibold uppercase tracking-wider">Total Profit</span>
           </div>
-          <p className="mt-2 stat-value text-up">+{fmtMoney(p.totalProfit)}</p>
+          <p className={`mt-2 stat-value ${signCls(p.totalProfit)}`}>{fmtSignedMoney(p.totalProfit)}</p>
         </Panel>
       </div>
 
@@ -56,7 +56,7 @@ export function PortfolioPanel() {
         </Panel>
         <Panel delay={0.35}>
           <span className="panel-title">Today</span>
-          <p className="mt-2 stat-value text-up">+{fmtMoney(p.todayProfit)}</p>
+          <p className={`mt-2 stat-value ${signCls(p.todayProfit)}`}>{fmtSignedMoney(p.todayProfit)}</p>
         </Panel>
       </div>
     </div>

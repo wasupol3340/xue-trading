@@ -198,7 +198,9 @@ class AutoTrader:
         # any tracked ticket no longer live has closed
         for ticket in [t for t in self._open_trades if t not in live]:
             meta = self._open_trades.pop(ticket)
-            pnl = meta.get("pnl", 0.0)
+            # exact realized P/L from MT5 history; fall back to last floating value
+            realized = client.closed_pnl(ticket)
+            pnl = realized if realized is not None else meta.get("pnl", 0.0)
             tech = meta.get("tech", "")
             self.state.realized_pnl_today += pnl
             if tech:

@@ -19,18 +19,23 @@ from typing import Optional
 
 STATE_FILE = os.environ.get("LEARNING_STATE_FILE", "learning_state.json")
 
-# key, display name, category — the technique universe
+# key, display name, category, starting score.
+# Starting scores are REPUTATION-BASED PRIORS from research: for XAUUSD (gold),
+# the SMC/ICT family (order blocks, FVG, liquidity) has the largest real-trader
+# following and dedicated gold material, while classic indicators (RSI/MACD/EMA)
+# are popular but widely considered lagging. These priors only set the initial
+# order — the live results on THIS account override them over time.
 SEED = [
-    ("smc", "Smart Money Concepts", "SMC", 62),
-    ("ict", "ICT (Inner Circle Trader)", "ICT", 60),
-    ("fvg", "Fair Value Gap", "ICT", 57),
-    ("liquidity", "Liquidity Sweep", "SMC", 58),
-    ("orderblock", "Order Block", "SMC", 58),
-    ("supplydemand", "Supply & Demand", "SMC", 55),
+    ("smc", "Smart Money Concepts", "SMC", 66),
+    ("ict", "ICT (Inner Circle Trader)", "ICT", 64),
+    ("orderblock", "Order Block", "SMC", 62),
+    ("liquidity", "Liquidity Sweep", "SMC", 61),
+    ("fvg", "Fair Value Gap", "ICT", 60),
+    ("wyckoff", "Wyckoff Method", "Volume", 58),
+    ("supplydemand", "Supply & Demand", "SMC", 57),
     ("ema", "EMA Confluence", "Indicator", 50),
-    ("rsi", "RSI Divergence", "Indicator", 48),
+    ("rsi", "RSI Divergence", "Indicator", 49),
     ("macd", "MACD Momentum", "Indicator", 47),
-    ("wyckoff", "Wyckoff Method", "Volume", 55),
 ]
 
 

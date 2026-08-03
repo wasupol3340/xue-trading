@@ -196,6 +196,16 @@ class MT5Client:
     def exposure(self, symbol: Optional[str] = None) -> float:
         return round(sum(p.lots for p in self.positions(symbol)), 2)
 
+    def closed_pnl(self, ticket: int) -> Optional[float]:
+        """Exact realized net profit (profit + swap + commission) of a closed
+        position, read from MT5 history. Returns None if unavailable."""
+        if _HAS_MT5 and self.connected:  # pragma: no cover
+            deals = mt5.history_deals_get(position=ticket)  # type: ignore
+            if deals:
+                return round(sum(d.profit + d.swap + d.commission for d in deals), 2)
+            return None
+        return None  # simulated broker → caller falls back to last floating pnl
+
     # ---- lot sizing ------------------------------------------------------- #
     def calc_lot(self, symbol: str, entry: float, sl: float, risk_pct: float, balance: float) -> float:
         risk_amount = balance * (risk_pct / 100.0)

@@ -18,6 +18,7 @@ from typing import List
 from app.schemas.trading import AgentOut, DecisionOut
 from app.services.market_data import get_candles
 from app.services.learning import learning
+from app.services.techniques import analyze
 
 AGENT_DEFS = [
     ("ceo", "CEO AI", "CEO", "Strategic Decision Maker"),
@@ -80,34 +81,40 @@ def snapshot_agents() -> List[AgentOut]:
 
 
 def run_meeting(symbol: str = "XAUUSD") -> DecisionOut:
-    candles = get_candles(symbol, "M15", 60)
-    bias = _trend_bias(candles)
+    candles = get_candles(symbol, "M15", 120)
 
-    base = "BUY" if bias > 0.05 else "SELL" if bias < -0.05 else "WAIT"
-    votes: dict[str, str] = {}
-    for _, name, role, _title in AGENT_DEFS:
-        if role == "News" and random.random() < 0.4:
-            votes[role] = "WAIT"
-        elif random.random() < 0.12:
-            votes[role] = "WAIT"
-        else:
-            votes[role] = base
-
-    tally = {v: list(votes.values()).count(v) for v in set(votes.values())}
-    decision = max(tally, key=tally.get)
-    approved = sum(1 for v in votes.values() if v == decision)
-    confidence = round(60 + (approved / len(votes)) * 39 + abs(bias) * 2, 0)
-    confidence = min(confidence, 99)
-
-    # Learning AI chooses the technique for this trade (weighted by live scores)
+    # Learning AI picks the technique (weighted by live scores); that technique's
+    # OWN logic then decides whether/where to trade on the real candles.
     technique_key = learning.pick_technique()
     technique_name = learning.name_of(technique_key)
+    sig = analyze(technique_key, candles)
+    signal_side = sig.get("side")
+    strength = float(sig.get("strength") or 0.0)
 
-    rationale = (
-        f"HTF bias {'bullish' if bias > 0 else 'bearish' if bias < 0 else 'neutral'} "
-        f"({bias:+.2f}%). {approved}/{len(votes)} agents aligned on {decision}. "
-        f"Technique: {technique_name}."
-    )
+    votes: dict[str, str] = {}
+    if signal_side is None:
+        # No valid setup for this technique this cycle → stand aside
+        for _, _n, role, _t in AGENT_DEFS:
+            votes[role] = "WAIT"
+        decision = "WAIT"
+        approved = len(votes)
+        confidence = round(40 + strength * 10)
+        rationale = f"{technique_name}: no valid setup ({sig.get('reason')}). Standing aside."
+    else:
+        base = signal_side
+        for _, _n, role, _t in AGENT_DEFS:
+            if role == "News" and random.random() < 0.35:
+                votes[role] = "WAIT"
+            elif random.random() < 0.1:
+                votes[role] = "WAIT"
+            else:
+                votes[role] = base
+        tally = {v: list(votes.values()).count(v) for v in set(votes.values())}
+        decision = max(tally, key=tally.get)
+        approved = sum(1 for v in votes.values() if v == decision)
+        agreement = approved / len(votes)
+        confidence = min(99, round(58 + strength * 30 + agreement * 12))
+        rationale = f"{technique_name}: {sig.get('reason')}. {approved}/{len(votes)} agents aligned on {decision}."
 
     return DecisionOut(
         symbol=symbol, decision=decision, confidence=confidence, votes=votes,

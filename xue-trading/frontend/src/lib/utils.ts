@@ -26,6 +26,16 @@ export function fmtPct(value: number, digits = 2) {
   return `${sign}${value.toFixed(digits)}%`;
 }
 
+/** Money with an explicit +/- sign (negatives already carry "-" from fmtMoney). */
+export function fmtSignedMoney(value: number, currency = "USD") {
+  return `${value >= 0 ? "+" : ""}${fmtMoney(value, currency)}`;
+}
+
+/** Green when >= 0, red when negative. */
+export function signCls(value: number) {
+  return value >= 0 ? "text-up" : "text-down";
+}
+
 export function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
   const m = Math.floor(diff / 60000);
