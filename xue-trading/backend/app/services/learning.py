@@ -171,6 +171,11 @@ class LearningEngine:
         self._save()
         return chosen.key
 
+    def note_technique(self, key: str) -> None:
+        """Record which technique is being traded/watched right now."""
+        self.current_technique = key
+        self._save()
+
     def name_of(self, key: str) -> str:
         s = self.strategies.get(key)
         return s.name if s else key

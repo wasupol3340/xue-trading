@@ -83,23 +83,40 @@ def snapshot_agents() -> List[AgentOut]:
 def run_meeting(symbol: str = "XAUUSD") -> DecisionOut:
     candles = get_candles(symbol, "M15", 120)
 
-    # Learning AI picks the technique (weighted by live scores); that technique's
-    # OWN logic then decides whether/where to trade on the real candles.
-    technique_key = learning.pick_technique()
+    # Check EVERY enabled technique on the real candles; trade the highest-scored
+    # technique that currently has a valid setup. This trades far more often and
+    # accumulates real results faster, while staying signal-driven.
+    candidates = []  # (key, signal, score)
+    for key, strat in learning.strategies.items():
+        if not strat.enabled:
+            continue
+        s = analyze(key, candles)
+        if s.get("side"):
+            candidates.append((key, s, strat.score))
+
+    if candidates:
+        candidates.sort(key=lambda c: c[2], reverse=True)  # highest score first
+        technique_key, sig, _ = candidates[0]
+    else:
+        # nobody has a setup this cycle — watch with the current top-scored technique
+        top = max(learning.strategies.values(), key=lambda s: s.score)
+        technique_key, sig = top.key, {"side": None, "reason": "no setup on any technique", "strength": 0.0}
+
+    learning.note_technique(technique_key)
     technique_name = learning.name_of(technique_key)
-    sig = analyze(technique_key, candles)
     signal_side = sig.get("side")
     strength = float(sig.get("strength") or 0.0)
+    n_setups = len(candidates)
 
     votes: dict[str, str] = {}
     if signal_side is None:
-        # No valid setup for this technique this cycle → stand aside
         for _, _n, role, _t in AGENT_DEFS:
             votes[role] = "WAIT"
         decision = "WAIT"
         approved = len(votes)
-        confidence = round(40 + strength * 10)
-        rationale = f"{technique_name}: no valid setup ({sig.get('reason')}). Standing aside."
+        confidence = 42
+        n_enabled = sum(1 for s in learning.strategies.values() if s.enabled)
+        rationale = f"No valid setup on any of {n_enabled} techniques. Watching."
     else:
         base = signal_side
         for _, _n, role, _t in AGENT_DEFS:
@@ -114,7 +131,11 @@ def run_meeting(symbol: str = "XAUUSD") -> DecisionOut:
         approved = sum(1 for v in votes.values() if v == decision)
         agreement = approved / len(votes)
         confidence = min(99, round(58 + strength * 30 + agreement * 12))
-        rationale = f"{technique_name}: {sig.get('reason')}. {approved}/{len(votes)} agents aligned on {decision}."
+        rationale = (
+            f"{technique_name}: {sig.get('reason')}. "
+            f"Best of {n_setups} technique(s) with a live setup. "
+            f"{approved}/{len(votes)} agents aligned on {decision}."
+        )
 
     return DecisionOut(
         symbol=symbol, decision=decision, confidence=confidence, votes=votes,
