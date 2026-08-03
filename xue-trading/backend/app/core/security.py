@@ -1,20 +1,31 @@
+import hashlib
+import hmac
+import os
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 
 from app.core.config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Stdlib PBKDF2 password hashing (only used by the optional DB seed) — avoids a
+# passlib/bcrypt dependency so the trading API runs light on the Windows host.
+_ITER = 200_000
 
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    salt = os.urandom(16)
+    dk = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, _ITER)
+    return f"pbkdf2$sha256${_ITER}${salt.hex()}${dk.hex()}"
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain, hashed)
+    try:
+        _, algo, iters, salt_hex, dk_hex = hashed.split("$")
+        dk = hashlib.pbkdf2_hmac(algo, plain.encode(), bytes.fromhex(salt_hex), int(iters))
+        return hmac.compare_digest(dk.hex(), dk_hex)
+    except Exception:  # noqa: BLE001
+        return False
 
 
 def _create_token(subject: str, expires: timedelta, token_type: str) -> str:

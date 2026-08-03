@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
+    # Dashboard login (single admin, DB-free)
+    DASHBOARD_USER: str = "master@xuetrading.ai"
+    DASHBOARD_PASSWORD: str = "xue-admin-2026"
+
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://xue:xue@localhost:5432/xue_trading"
 

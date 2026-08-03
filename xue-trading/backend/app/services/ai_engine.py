@@ -3,6 +3,9 @@ Autonomous AI decision engine.
 
 Eight specialized agents each produce a vote and confidence. The CEO agent
 aggregates them into a final decision. Risk AI has veto power via RiskManager.
+The Learning AI (services/learning.py) chooses which technique to trade,
+weighted by how each has actually performed on this account.
+
 This is a deterministic-ish heuristic model designed to be swapped for real
 ML inference / LLM reasoning without changing the API surface.
 """
@@ -14,6 +17,7 @@ from typing import List
 
 from app.schemas.trading import AgentOut, DecisionOut
 from app.services.market_data import get_candles
+from app.services.learning import learning
 
 AGENT_DEFS = [
     ("ceo", "CEO AI", "CEO", "Strategic Decision Maker"),
@@ -49,18 +53,25 @@ def _trend_bias(candles) -> float:
 
 def snapshot_agents() -> List[AgentOut]:
     agents: List[AgentOut] = []
+    tech = learning.name_of(learning.current_technique) if learning.current_technique else "market structure"
+    tasks = {
+        "ceo": "Weighing agent consensus for XAUUSD",
+        "research": f"Scanning HTF structure via {tech}",
+        "news": "Parsing macro feed & gold sentiment",
+        "risk": "Enforcing risk % & exposure caps",
+        "strategy": f"Building plan with {tech}",
+        "execution": "Routing orders to MT5 bridge",
+        "learning": f"Scoring techniques from live results",
+        "monitor": "Watching MT5 link, latency & drawdown",
+    }
     for aid, name, role, title in AGENT_DEFS:
         agents.append(
             AgentOut(
-                id=aid,
-                name=name,
-                role=role,
-                title=title,
-                status=STATUS[aid],
+                id=aid, name=name, role=role, title=title, status=STATUS[aid],
                 confidence=round(random.uniform(70, 99), 0),
                 cpu=round(random.uniform(15, 85), 0),
                 memory=round(random.uniform(30, 80), 0),
-                current_task=f"{title} · evaluating XAUUSD",
+                current_task=tasks[aid],
                 performance=round(random.uniform(82, 99), 0),
                 online=True,
             )
@@ -75,7 +86,6 @@ def run_meeting(symbol: str = "XAUUSD") -> DecisionOut:
     base = "BUY" if bias > 0.05 else "SELL" if bias < -0.05 else "WAIT"
     votes: dict[str, str] = {}
     for _, name, role, _title in AGENT_DEFS:
-        # News occasionally holds; others largely follow structural bias
         if role == "News" and random.random() < 0.4:
             votes[role] = "WAIT"
         elif random.random() < 0.12:
@@ -89,18 +99,18 @@ def run_meeting(symbol: str = "XAUUSD") -> DecisionOut:
     confidence = round(60 + (approved / len(votes)) * 39 + abs(bias) * 2, 0)
     confidence = min(confidence, 99)
 
+    # Learning AI chooses the technique for this trade (weighted by live scores)
+    technique_key = learning.pick_technique()
+    technique_name = learning.name_of(technique_key)
+
     rationale = (
         f"HTF bias {'bullish' if bias > 0 else 'bearish' if bias < 0 else 'neutral'} "
         f"({bias:+.2f}%). {approved}/{len(votes)} agents aligned on {decision}. "
-        "SMC + ICT confluence at premium/discount zone."
+        f"Technique: {technique_name}."
     )
 
     return DecisionOut(
-        symbol=symbol,
-        decision=decision,
-        confidence=confidence,
-        votes=votes,
-        approved=approved,
-        total=len(votes),
-        rationale=rationale,
+        symbol=symbol, decision=decision, confidence=confidence, votes=votes,
+        approved=approved, total=len(votes), rationale=rationale,
+        technique=technique_key, technique_name=technique_name,
     )

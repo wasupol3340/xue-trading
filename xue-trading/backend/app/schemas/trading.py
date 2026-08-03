@@ -83,3 +83,5 @@ class DecisionOut(BaseModel):
     approved: int
     total: int
     rationale: str
+    technique: str = ""
+    technique_name: str = ""

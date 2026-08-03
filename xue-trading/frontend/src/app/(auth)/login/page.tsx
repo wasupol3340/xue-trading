@@ -3,27 +3,20 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Lock, Mail, ArrowRight, ShieldCheck, Loader2 } from "lucide-react";
+import { Lock, Mail, ArrowRight, ShieldCheck, Loader2, Info } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
+import { isBackendConfigured } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login, loading, error } = useAuthStore();
   const [email, setEmail] = useState("master@xuetrading.ai");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    setError("");
-    try {
-      // Wire to FastAPI: await api.login(email, password)
-      await new Promise((r) => setTimeout(r, 900));
-      router.push("/dashboard");
-    } catch {
-      setError("Invalid credentials");
-      setLoading(false);
-    }
+    const ok = await login(email, password);
+    if (ok) router.push("/dashboard");
   }
 
   return (
@@ -74,7 +67,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-transparent py-3 text-sm text-white placeholder:text-muted-soft focus:outline-none"
                 placeholder="••••••••"
-                required
+                required={isBackendConfigured()}
               />
             </div>
           </div>
@@ -87,9 +80,16 @@ export default function LoginPage() {
           </button>
         </form>
 
+        {!isBackendConfigured() && (
+          <div className="mt-4 flex items-start gap-2 rounded-xl border border-accent-cyan/20 bg-accent-cyan/5 p-3 text-[11px] text-muted">
+            <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent-cyan" />
+            Demo mode — no backend connected yet. Sign in with anything to explore the UI on sample data.
+          </div>
+        )}
+
         <div className="mt-6 flex items-center justify-center gap-2 text-[11px] text-muted">
           <ShieldCheck className="h-3.5 w-3.5 text-accent-green" />
-          Secured with JWT · Refresh token rotation · 2FA ready
+          Secured with JWT · Refresh token rotation
         </div>
       </motion.div>
     </div>

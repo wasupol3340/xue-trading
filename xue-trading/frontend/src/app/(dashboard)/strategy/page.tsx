@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { STRATEGIES } from "@/lib/mock-data";
+import { useTradingStore } from "@/store/useTradingStore";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Meter } from "@/components/ui/Meter";
 
@@ -19,7 +19,9 @@ function scoreColor(s: number) {
 }
 
 export default function StrategyPage() {
-  const sorted = [...STRATEGIES].sort((a, b) => b.score - a.score);
+  const strategies = useTradingStore((s) => s.strategies);
+  const currentTechnique = useTradingStore((s) => s.currentTechnique);
+  const sorted = [...strategies].sort((a, b) => b.score - a.score);
 
   return (
     <div>
@@ -60,6 +62,11 @@ export default function StrategyPage() {
                     <span className="chip text-[10px]" style={{ color: catColor[s.category] }}>
                       {s.category}
                     </span>
+                    {s.id === currentTechnique && (
+                      <span className="chip border-accent-green/40 bg-accent-green/10 text-[9px] font-bold text-accent-green">
+                        ● TRADING NOW
+                      </span>
+                    )}
                   </div>
                 </td>
                 <td className="px-4 py-3">

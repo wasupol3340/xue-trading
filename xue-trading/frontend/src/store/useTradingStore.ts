@@ -1,8 +1,8 @@
 "use client";
 
 import { create } from "zustand";
-import { Agent, Meeting, Portfolio, Position, LogEntry } from "@/types";
-import { AGENTS, MEETING, PORTFOLIO, POSITIONS, LOGS } from "@/lib/mock-data";
+import { Agent, Meeting, Portfolio, Position, LogEntry, Strategy } from "@/types";
+import { AGENTS, MEETING, PORTFOLIO, POSITIONS, LOGS, STRATEGIES } from "@/lib/mock-data";
 
 interface TradingState {
   symbol: string;
@@ -20,8 +20,15 @@ interface TradingState {
   meeting: Meeting;
   portfolio: Portfolio;
   positions: Position[];
+  strategies: Strategy[];
   logs: LogEntry[];
   connection: { mt5: boolean; server: string; latency: number };
+
+  // live-backend state
+  isLive: boolean;
+  engineRunning: boolean;
+  currentTechnique: string;
+  currentTechniqueName: string;
 
   setTimeframe: (tf: string) => void;
   toggleAuto: () => void;
@@ -31,6 +38,7 @@ interface TradingState {
   setSl: (v: number) => void;
   tick: () => void;
   pushLog: (log: LogEntry) => void;
+  hydrate: (partial: Partial<TradingState>) => void;
 }
 
 export const useTradingStore = create<TradingState>((set, get) => ({
@@ -49,8 +57,14 @@ export const useTradingStore = create<TradingState>((set, get) => ({
   meeting: MEETING,
   portfolio: PORTFOLIO,
   positions: POSITIONS,
+  strategies: STRATEGIES,
   logs: LOGS,
   connection: { mt5: true, server: "MetaQuotes-Demo", latency: 41 },
+
+  isLive: false,
+  engineRunning: false,
+  currentTechnique: "",
+  currentTechniqueName: "",
 
   setTimeframe: (tf) => set({ timeframe: tf }),
   toggleAuto: () => set((s) => ({ autoTrading: !s.autoTrading })),
@@ -74,4 +88,6 @@ export const useTradingStore = create<TradingState>((set, get) => ({
     }),
 
   pushLog: (log) => set((s) => ({ logs: [log, ...s.logs].slice(0, 60) })),
+
+  hydrate: (partial) => set(partial),
 }));

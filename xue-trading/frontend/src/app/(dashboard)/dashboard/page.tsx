@@ -13,6 +13,7 @@ import { EconomicNewsPanel } from "@/components/dashboard/EconomicNewsPanel";
 import { SignalCards } from "@/components/dashboard/SignalCards";
 import { TradeControls } from "@/components/dashboard/TradeControls";
 import { MeetingTimeline } from "@/components/dashboard/MeetingTimeline";
+import { LiveTechniqueBar } from "@/components/dashboard/LiveTechniqueBar";
 import { fmtNumber } from "@/lib/utils";
 
 const TIMEFRAMES = ["M1", "M5", "M15", "H1", "H4", "D1"];
@@ -44,6 +45,7 @@ export default function DashboardPage() {
 
       {/* CENTER — Chart + signals + controls */}
       <div className="order-1 flex min-w-0 flex-col gap-4 xl:order-2">
+        <LiveTechniqueBar />
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="glass p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
