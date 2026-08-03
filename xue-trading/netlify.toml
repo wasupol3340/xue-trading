@@ -1,0 +1,21 @@
+# Netlify config for the XUE Trading frontend (Next.js 15).
+# Netlify hosts the FRONTEND only. The FastAPI backend, PostgreSQL, WebSocket
+# and the MT5 auto-trading engine must run elsewhere (see docs/DEPLOY_NETLIFY.md).
+
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = ".next"
+
+# Official Next.js runtime — enables App Router, SSR and image optimization.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NEXT_TELEMETRY_DISABLED = "1"
+
+# Set these in Netlify UI (Site settings → Environment variables) to point the
+# UI at your deployed backend. If omitted, the UI runs on built-in mock data.
+#   NEXT_PUBLIC_API_URL = "https://your-backend.onrender.com"
+#   NEXT_PUBLIC_WS_URL  = "wss://your-backend.onrender.com/ws"

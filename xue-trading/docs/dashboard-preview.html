@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>XUE Trading — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#05070d;--panel:rgba(255,255,255,.025);--border:rgba(255,255,255,.07);
+    --gold:#f0b429;--blue:#3b82f6;--cyan:#22d3ee;--violet:#8b5cf6;
+    --green:#22c55e;--red:#ef4444;--orange:#f97316;--muted:#8a93a6;--soft:#5b6478;
+  }
+  html,body{height:100%}
+  body{
+    font-family:'Inter',system-ui,sans-serif;color:#e6e9f0;
+    background:
+      radial-gradient(1200px circle at 12% -10%,rgba(59,130,246,.10),transparent 45%),
+      radial-gradient(1000px circle at 92% 0%,rgba(139,92,246,.09),transparent 42%),
+      var(--bg);
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  .mono{font-family:'JetBrains Mono',monospace}
+  .glass{background:var(--panel);border:1px solid var(--border);border-radius:18px;
+    backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 10px 40px -14px rgba(0,0,0,.7)}
+  .up{color:var(--green)}.down{color:var(--red)}.gold{color:var(--gold)}
+  .title{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  ::-webkit-scrollbar{width:7px;height:7px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:9px}
+
+  /* ---- top bar ---- */
+  .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:22px;
+    height:60px;padding:0 22px;border-bottom:1px solid var(--border);
+    background:rgba(5,7,13,.72);backdrop-filter:blur(20px)}
+  .logo{display:flex;align-items:center;gap:11px}
+  .logo .mark{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--gold),#b45309);color:#000;font-weight:900;font-size:20px;
+    box-shadow:0 0 26px rgba(240,180,41,.4)}
+  .logo b{font-size:16px;letter-spacing:.5px}
+  .goldgrad{background:linear-gradient(135deg,#f0b429,#f6e05e);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .nav{display:flex;gap:4px;margin-left:8px}
+  .nav a{padding:8px 14px;border-radius:10px;font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;transition:.2s}
+  .nav a.active{color:#fff;background:rgba(255,255,255,.06)}
+  .nav a.active{position:relative}
+  .nav a.active::after{content:'';position:absolute;left:14px;right:14px;bottom:2px;height:2px;border-radius:2px;background:var(--gold)}
+  .nav a:hover{color:#fff}
+  .top-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+  .pill{display:flex;align-items:center;gap:7px;padding:7px 12px;border-radius:11px;font-size:12px;border:1px solid var(--border)}
+  .pill.ok{border-color:rgba(34,197,94,.25);background:rgba(34,197,94,.08);color:var(--green)}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+  .avatar{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-weight:700;
+    background:linear-gradient(135deg,var(--violet),var(--cyan))}
+
+  /* ---- layout ---- */
+  .wrap{display:grid;grid-template-columns:250px minmax(0,1fr) 320px;gap:16px;padding:16px 22px 40px}
+  @media(max-width:1300px){.wrap{grid-template-columns:1fr}}
+
+  /* ---- agent rail ---- */
+  .rail{padding:14px}
+  .rail-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:0 2px}
+  .badge{font-size:11px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.1);color:var(--green)}
+  .agent{display:flex;align-items:center;gap:11px;padding:9px;border-radius:13px;border:1px solid rgba(255,255,255,.05);
+    background:rgba(255,255,255,.015);margin-bottom:8px;cursor:pointer;transition:.2s}
+  .agent:hover{background:rgba(255,255,255,.045);transform:translateX(2px)}
+  .agent . av{position:relative;width:40px;height:40px;border-radius:11px;display:grid;place-items:center;font-weight:800;font-size:12px;color:#fff}
+  .agent . st{position:absolute;bottom:-2px;right:-2px;width:12px;height:12px;border-radius:50%;border:2px solid #0a0e18}
+  .agent .info{flex:1;min-width:0}
+  .agent .info b{font-size:13px;display:block}
+  .agent .info small{font-size:11px;color:var(--muted);display:block}
+  .agent .info .task{font-size:11px;font-weight:600;margin-top:1px}
+  .wave{display:flex;align-items:flex-end;gap:2px;height:20px}
+  .wave span{width:2px;border-radius:2px;animation:wv 1s ease-in-out infinite}
+  @keyframes wv{0%,100%{height:5px;opacity:.6}50%{height:16px;opacity:1}}
+
+  /* ---- center ---- */
+  .center{display:flex;flex-direction:column;gap:16px;min-width:0}
+  .chart-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  .sym{display:flex;align-items:center;gap:12px}
+  .sym .mark{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,var(--gold),#b45309)}
+  .sym h2{font-size:19px}
+  .price{font-size:26px;font-weight:800}
+  .tf{display:flex;gap:3px;padding:4px;border:1px solid var(--border);border-radius:11px}
+  .tf button{background:none;border:none;color:var(--muted);font-size:12px;font-weight:600;padding:5px 10px;border-radius:8px;cursor:pointer}
+  .tf button.active{background:var(--blue);color:#fff;box-shadow:0 0 20px -4px rgba(59,130,246,.6)}
+  .chartbox{position:relative;margin-top:14px}
+  .live{position:absolute;top:4px;right:6px;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green)}
+  .live .dot{width:6px;height:6px;animation:blink 1.4s infinite}
+  @keyframes blink{50%{opacity:.3}}
+
+  .signals{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  @media(max-width:900px){.signals{grid-template-columns:repeat(2,1fr)}}
+  .card{padding:15px}
+  .card .big{font-size:22px;font-weight:800;margin-top:6px}
+  .ring{position:relative;width:70px;height:70px;margin:4px auto 0}
+  .ring .val{position:absolute;inset:0;display:grid;place-items:center;font-weight:700;font-size:15px}
+  .cap{text-align:center;font-size:11px;font-weight:600;margin-top:2px}
+
+  .controls{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  @media(max-width:900px){.controls{grid-template-columns:repeat(2,1fr)}}
+  .step{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+  .step button{width:30px;height:30px;border-radius:9px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:var(--muted);font-size:16px;cursor:pointer}
+  .step .v{font-family:'JetBrains Mono';font-size:17px;font-weight:600}
+  .auto{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:16px;
+    border:1px solid rgba(139,92,246,.4);background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(34,211,238,.14));cursor:pointer}
+  .toggle{width:38px;height:20px;border-radius:999px;background:rgba(34,197,94,.8);position:relative}
+  .toggle::after{content:'';position:absolute;top:2px;left:20px;width:16px;height:16px;border-radius:50%;background:#fff}
+
+  /* ---- meeting ---- */
+  .meet-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .timeline{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px}
+  .msg{min-width:158px;flex:1;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.02);padding:11px;border-top-width:2px}
+  .msg .row{display:flex;justify-content:space-between;margin-bottom:5px}
+  .msg b{font-size:11px}.msg time{font-size:10px;color:var(--muted)}
+  .msg p{font-size:11px;color:var(--muted);line-height:1.4}
+  .msg .vote{font-size:11px;font-weight:800;margin-top:7px;display:inline-block}
+  .agreed{margin-top:12px;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border-radius:12px;
+    border:1px solid rgba(34,197,94,.2);background:rgba(34,197,94,.06);font-size:14px;font-weight:600}
+
+  /* ---- right ---- */
+  .right{display:flex;flex-direction:column;gap:16px}
+  .po{display:flex;gap:14px;align-items:center}
+  .po .ring{width:100px;height:100px;margin:0}
+  .porow{display:flex;justify-content:space-between;margin:6px 0}
+  .porow small{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .porow b{font-family:'JetBrains Mono';font-size:13px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .stat .big{font-family:'JetBrains Mono';font-size:22px;font-weight:700;margin-top:6px}
+  .riskbar{position:relative;height:10px;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--gold),var(--red));margin:10px 0 6px}
+  .riskbar .knob{position:absolute;top:50%;width:16px;height:16px;border-radius:50%;border:2px solid #fff;background:rgba(255,255,255,.2);transform:translate(-50%,-50%);box-shadow:0 0 10px rgba(255,255,255,.6)}
+  .news-row{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+  .news-row:last-child{border:none}
+  .news-row .t{font-family:'JetBrains Mono';font-size:12px;color:var(--muted);width:40px}
+  .news-row .body{flex:1;min-width:0}
+  .news-row .body p{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .news-row .body small{font-size:10px;color:var(--muted)}
+  .imp{width:10px;height:10px;border-radius:50%}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="logo"><div class="mark">X</div><b>XUE <span class="goldgrad">TRADING</span></b></div>
+    <nav class="nav">
+      <a class="active">Dashboard</a><a>AI Agents</a><a>Research Lab</a><a>MT5 Connection</a><a>Performance</a><a>Settings</a>
+    </nav>
+    <div class="top-right">
+      <div class="pill ok"><span class="dot"></span>MT5 Connected</div>
+      <div class="pill"><span style="color:var(--soft)">MetaQuotes-Demo</span> <span class="mono">41ms</span></div>
+      <div class="avatar">X</div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <!-- LEFT: AGENT RAIL -->
+    <aside class="glass rail">
+      <div class="rail-head"><span class="title">AI Agents</span><span class="badge">8/8 Online</span></div>
+      <div id="agents"></div>
+    </aside>
+
+    <!-- CENTER -->
+    <main class="center">
+      <section class="glass" style="padding:16px">
+        <div class="chart-head">
+          <div class="sym">
+            <div class="mark">⛊</div>
+            <div>
+              <div style="display:flex;gap:8px;align-items:center"><h2>XAUUSD</h2><small style="color:var(--muted)">Gold / U.S. Dollar</small></div>
+              <div style="display:flex;gap:8px;align-items:baseline">
+                <span class="price mono" id="price">2,345.68</span>
+                <span class="up mono" id="chg" style="font-weight:600">+18.47 (+0.79%)</span>
+              </div>
+            </div>
+          </div>
+          <div class="tf">
+            <button>M1</button><button>M5</button><button class="active">M15</button><button>H1</button><button>H4</button><button>D1</button>
+          </div>
+        </div>
+        <div class="chartbox">
+          <div class="live"><span class="dot"></span>Real-time</div>
+          <svg id="chart" viewBox="0 0 1000 380" style="width:100%;height:380px"></svg>
+        </div>
+      </section>
+
+      <section class="signals">
+        <div class="glass card"><span class="title">AI Signal</span><div class="big up">BUY ↗</div><small style="color:var(--muted)">Strong Buy</small></div>
+        <div class="glass card"><span class="title">Confidence</span>
+          <div class="ring" data-ring="87" data-color="#22c55e"><div class="val">87%</div></div><div class="cap up">High</div></div>
+        <div class="glass card"><span class="title">Trend</span><div class="big" style="color:var(--cyan)">BULLISH</div><small style="color:var(--muted)">Up Trend ↗</small></div>
+        <div class="glass card"><span class="title">Volatility</span><div class="big gold">MEDIUM</div><small style="color:var(--muted)">Normal Range</small></div>
+        <div class="glass card"><span class="title">AI Score</span>
+          <div class="ring" data-ring="87" data-color="#8b5cf6"><div class="val">8.7</div></div><div class="cap" style="color:var(--violet)">Excellent</div></div>
+      </section>
+
+      <section class="controls">
+        <div class="glass card"><span class="title">Lot Size</span><div class="step"><button>−</button><span class="v">0.10</span><button>+</button></div></div>
+        <div class="glass card"><span class="title">Risk Level</span><div class="step"><button>−</button><span class="v">5%</span><button>+</button></div></div>
+        <div class="glass card"><span class="title">Take Profit</span><div class="step"><span class="v up">2370.00</span><span style="color:var(--muted)">✎</span></div></div>
+        <div class="glass card"><span class="title">Stop Loss</span><div class="step"><span class="v down">2320.00</span><span style="color:var(--muted)">✎</span></div></div>
+        <div class="auto card"><span style="font-size:11px;font-weight:700;letter-spacing:.08em">AUTO TRADING</span><div style="display:flex;gap:8px;align-items:center"><b class="up">ON</b><span class="toggle"></span></div></div>
+      </section>
+
+      <section class="glass" style="padding:16px">
+        <div class="meet-head">
+          <span style="color:var(--cyan)">◉</span><b style="font-size:14px">AI Meeting Room</b>
+          <span class="badge"><span class="dot" style="display:inline-block;margin-right:4px"></span>Live Discussion</span>
+          <span style="margin-left:auto;font-size:11px;color:var(--muted)">Every 15 min</span>
+        </div>
+        <div class="timeline" id="timeline"></div>
+        <div class="agreed"><span class="up">✔</span>All agents agreed to execute trade · <span class="up">Confidence 87%</span></div>
+      </section>
+    </main>
+
+    <!-- RIGHT -->
+    <aside class="right">
+      <section class="glass" style="padding:16px">
+        <span class="title">Portfolio Overview</span>
+        <div class="po" style="margin-top:12px">
+          <div class="ring" data-ring="72" data-color="#3b82f6" data-size="100" style="width:100px;height:100px"><div class="val" style="flex-direction:column;font-size:18px">72%<small style="font-size:9px;color:var(--muted)">Equity</small></div></div>
+          <div style="flex:1">
+            <div class="porow"><small>Balance</small><b>$1,000.00</b></div>
+            <div class="porow"><small>Equity</small><b>$1,720.45</b></div>
+            <div class="porow"><small>Profit</small><b class="up">+$720.45</b></div>
+            <div class="porow"><small>Drawdown</small><b class="down">-4.12%</b></div>
+          </div>
+        </div>
+      </section>
+      <div class="grid2">
+        <div class="glass card"><span class="title">Open Positions</span><div class="stat"><div class="big">3</div></div></div>
+        <div class="glass card"><span class="title">Total Profit</span><div class="stat"><div class="big up">+$720</div></div></div>
+      </div>
+      <section class="glass" style="padding:16px">
+        <div style="display:flex;justify-content:space-between"><span class="title">Risk Meter</span><b class="gold mono" style="font-size:13px">4.12%</b></div>
+        <div class="riskbar"><div class="knob" style="left:20%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;text-transform:uppercase;letter-spacing:.05em"><span class="up">Low Risk</span><span style="color:var(--muted)">Medium</span><span class="down">High</span></div>
+      </section>
+      <div class="grid2">
+        <div class="glass card"><span class="title">Win Rate</span><div class="stat"><div class="big" style="color:var(--cyan)">68.4%</div></div></div>
+        <div class="glass card"><span class="title">Today</span><div class="stat"><div class="big up">+$216</div></div></div>
+      </div>
+      <section class="glass" style="padding:16px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span class="title">Economic News</span><a style="font-size:11px;color:var(--cyan);cursor:pointer">View All</a></div>
+        <div id="news"></div>
+      </section>
+    </aside>
+  </div>
+
+<script>
+  function ring(v,c,size){size=size||70;const r=(size-8)/2,cc=2*Math.PI*r,off=cc-(v/100)*cc;
+    return `<svg width="${size}" height="${size}" style="transform:rotate(-90deg)">
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="6"/>
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round"
+        stroke-dasharray="${cc}" stroke-dashoffset="${off}" style="filter:drop-shadow(0 0 5px ${c}88)"/></svg>`;}
+
+  // fill static rings
+  document.querySelectorAll('[data-ring]').forEach(el=>{
+    const v=+el.dataset.ring,c=el.dataset.color,size=+(el.dataset.size||70);
+    el.insertAdjacentHTML('afterbegin',ring(v,c,size));
+  });
+
+  // agents
+  const AG=[
+    ['CE','CEO AI','Strategic Decision Maker','Thinking','#f0b429'],
+    ['RE','Research AI','Market Researcher','Analyzing','#3b82f6'],
+    ['NE','News AI','News & Sentiment','Scanning','#22c55e'],
+    ['RI','Risk AI','Risk Management','Monitoring','#8b5cf6'],
+    ['ST','Strategy AI','Strategy Developer','Optimizing','#f6ad55'],
+    ['EX','Execution AI','Order Executor','Trading','#22d3ee'],
+    ['LE','Learning AI','Machine Learning','Learning','#60a5fa'],
+    ['MO','Monitor AI','System Monitor','Monitoring','#2dd4bf'],
+  ];
+  document.getElementById('agents').innerHTML=AG.map(a=>`
+    <div class="agent">
+      <div class="av" style="background:linear-gradient(135deg,${a[4]},rgba(0,0,0,.4));box-shadow:0 0 16px ${a[4]}44">${a[0]}
+        <span class="st" style="background:${a[4]}"></span></div>
+      <div class="info"><b>${a[1]}</b><small>${a[2]}</small><span class="task" style="color:${a[4]}">${a[3]}…</span></div>
+      <div class="wave">${[0,1,2,3,4].map(i=>`<span style="background:${a[4]};animation-delay:${i*.09}s"></span>`).join('')}</div>
+    </div>`).join('');
+
+  // meeting
+  const M=[
+    ['CEO','09:15:23',"Let's analyze current market condition.",'','#f0b429'],
+    ['Research','09:15:35','Gold is showing bullish momentum on higher TF.','BUY','#3b82f6'],
+    ['News','09:15:42','News sentiment is positive for gold.','WAIT','#22c55e'],
+    ['Risk','09:15:48','Risk level is within safe limit.','BUY','#8b5cf6'],
+    ['Strategy','09:15:55','Pullback strategy with SMC + ICT confluence.','BUY','#f6ad55'],
+    ['Execution','09:16:02','Ready to execute buy order with 0.10 lot.','BUY','#22d3ee'],
+    ['CEO','09:16:10','All agents agree. Execute the trade.','BUY ✓','#f0b429'],
+  ];
+  const vc={BUY:'var(--green)','BUY ✓':'var(--green)',WAIT:'var(--gold)',SELL:'var(--red)'};
+  document.getElementById('timeline').innerHTML=M.map(m=>`
+    <div class="msg" style="border-top-color:${m[4]}">
+      <div class="row"><b style="color:${m[4]}">${m[0]} AI</b><time>${m[1]}</time></div>
+      <p>${m[2]}</p>${m[3]?`<span class="vote" style="color:${vc[m[3]]}">${m[3]}</span>`:''}
+    </div>`).join('') + `
+    <div class="msg" style="min-width:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-top-color:#8b5cf6">
+      <div style="position:relative">${ring(100,'#8b5cf6',56)}<div style="position:absolute;inset:0;display:grid;place-items:center;font-weight:700;font-family:'JetBrains Mono'">8/8</div></div>
+      <small style="color:var(--muted);margin-top:4px">Approved</small></div>`;
+
+  // news
+  const N=[
+    ['08:30','USD','🇺🇸','Non-Farm Payrolls (May)','272K','185K','var(--red)'],
+    ['07:00','EUR','🇪🇺','CPI (YoY) (May)','2.6%','2.4%','var(--orange)'],
+    ['06:00','GBP','🇬🇧','GDP (QoQ) (Q1)','0.7%','0.6%','var(--green)'],
+    ['05:30','USD','🇺🇸','Crude Oil Inventories','-2.3M','-1.8M','var(--orange)'],
+    ['04:00','USD','🇺🇸','Fed Chair Powell Speaks','—','—','var(--red)'],
+  ];
+  document.getElementById('news').innerHTML=N.map(n=>`
+    <div class="news-row"><span class="t">${n[0]}</span><span>${n[2]}</span><b style="font-size:11px;width:34px">${n[1]}</b>
+      <div class="body"><p>${n[3]}</p><small>Actual: ${n[4]} · Forecast: ${n[5]}</small></div>
+      <span class="imp" style="background:${n[6]};box-shadow:0 0 8px ${n[6]}"></span></div>`).join('');
+
+  // candlestick chart
+  function drawChart(){
+    const svg=document.getElementById('chart'),W=1000,H=380,pad={t:16,r:60,b:20,l:6};
+    const n=80;let p=2320;const cs=[];
+    for(let i=0;i<n;i++){const o=p,c=o+Math.sin(i/6)*2.4+(Math.random()-.5)*6,h=Math.max(o,c)+Math.random()*3,l=Math.min(o,c)-Math.random()*3;cs.push({o,c,h,l});p=c;}
+    const lo=Math.min(...cs.map(c=>c.l))-3,hi=Math.max(...cs.map(c=>c.h))+3;
+    const iw=W-pad.l-pad.r,ih=H-pad.t-pad.b,xs=iw/n;
+    const Y=v=>pad.t+ih-((v-lo)/(hi-lo))*ih,X=i=>pad.l+i*xs+xs/2,cw=xs*.6;
+    let s='';
+    for(let g=0;g<=5;g++){const pr=lo+(hi-lo)*g/5,y=Y(pr);s+=`<line x1="${pad.l}" x2="${pad.l+iw}" y1="${y}" y2="${y}" stroke="rgba(255,255,255,.04)"/><text x="${W-pad.r+6}" y="${y+3}" fill="#6b7280" font-size="10" font-family="monospace">${pr.toFixed(2)}</text>`;}
+    // order block
+    s+=`<rect x="${X(16)-cw}" y="${Y(cs[16].h+4)}" width="${cw*6}" height="${Math.abs(Y(cs[16].l-4)-Y(cs[16].h+4))}" fill="rgba(59,130,246,.1)" stroke="rgba(59,130,246,.4)" stroke-dasharray="3 3"/><text x="${X(16)+4}" y="${Y(cs[16].h+4)-4}" fill="#60a5fa" font-size="9">ORDER BLOCK</text>`;
+    // fvg
+    s+=`<rect x="${X(46)}" y="${Y(cs[46].h)}" width="${cw*4}" height="20" fill="rgba(139,92,246,.14)" stroke="rgba(139,92,246,.45)" stroke-dasharray="2 2"/><text x="${X(46)+4}" y="${Y(cs[46].h)+13}" fill="#a78bfa" font-size="9">FVG</text>`;
+    // liquidity
+    const ly=Y(hi-(hi-lo)*.14);s+=`<line x1="${pad.l}" x2="${pad.l+iw}" y1="${ly}" y2="${ly}" stroke="rgba(239,68,68,.5)" stroke-dasharray="6 4"/><text x="${pad.l+6}" y="${ly-4}" fill="#f87171" font-size="9">LIQUIDITY</text>`;
+    cs.forEach((c,i)=>{const up=c.c>=c.o,x=X(i),t=Math.min(Y(c.o),Y(c.c)),bh=Math.max(2,Math.abs(Y(c.c)-Y(c.o)));const col=up?'#22d3ee':'#f59e0b';
+      s+=`<line x1="${x}" x2="${x}" y1="${Y(c.h)}" y2="${Y(c.l)}" stroke="${col}"/><rect x="${x-cw/2}" y="${t}" width="${cw}" height="${bh}" rx="1" fill="${col}"/>`;});
+    // markers
+    const mk=[[11,'SELL','#ef4444',cs[11].h,-28],[19,'BUY','#3b82f6',cs[19].l,20],[44,'SELL','#ef4444',cs[44].h,-28],[52,'BUY','#3b82f6',cs[52].l,20],[72,'BUY STRONG','#22c55e',cs[72].l,20]];
+    mk.forEach(m=>{const x=X(m[0]),y=Y(m[3]),w=m[1].length*6.6+8;
+      s+=`<g transform="translate(${x-w/2},${y+m[4]-8})"><rect width="${w}" height="16" rx="4" fill="${m[2]}"/><text x="${w/2}" y="11" text-anchor="middle" fill="#fff" font-size="9" font-weight="700">${m[1]}</text></g>`;});
+    // current price
+    const cur=cs[n-1].c,cy=Y(cur);s+=`<line x1="${pad.l}" x2="${pad.l+iw}" y1="${cy}" y2="${cy}" stroke="#f0b429" stroke-dasharray="4 4"/><rect x="${W-pad.r}" y="${cy-9}" width="${pad.r}" height="18" rx="3" fill="#f0b429"/><text x="${W-pad.r+6}" y="${cy+3}" fill="#000" font-size="10" font-weight="700" font-family="monospace">${cur.toFixed(2)}</text>`;
+    svg.innerHTML=s;
+  }
+  drawChart();
+
+  // live price flicker
+  let pr=2345.68;
+  setInterval(()=>{pr+=(Math.random()-.5)*1.4;const el=document.getElementById('price');el.textContent=pr.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+    const c=(pr-2327.21);document.getElementById('chg').textContent=`${c>=0?'+':''}${c.toFixed(2)} (${c>=0?'+':''}${(c/2327.21*100).toFixed(2)}%)`;
+    document.getElementById('chg').className=(c>=0?'up':'down')+' mono';document.getElementById('chg').style.fontWeight='600';},1600);
+</script>
+</body>
+</html>
