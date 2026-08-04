@@ -70,6 +70,7 @@ export const api = {
   status: () => request<any>("/trading/status"),
   account: () => request<any>("/trading/account"),
   positions: () => request<any[]>("/trading/positions"),
+  history: () => request<any>("/trading/history"),
   agents: () => request<any[]>("/agents"),
   decision: () => request<any>("/agents/decision"),
   strategies: () => request<any[]>("/strategies"),

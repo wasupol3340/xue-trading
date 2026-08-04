@@ -1,22 +1,65 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { TRADES } from "@/lib/mock-data";
+import { useEffect, useState } from "react";
+import { api, isBackendConfigured } from "@/lib/api";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { fmtMoney, fmtNumber } from "@/lib/utils";
 
+type Trade = {
+  id: string;
+  symbol: string;
+  side: string;
+  lots: number;
+  entry: number;
+  exit: number;
+  pnl: number;
+  technique: string;
+  result: string;
+  closed_at: number;
+};
+type Stats = { total: number; win_rate: number; net_pnl: number; best_technique: string };
+
 export default function HistoryPage() {
-  const wins = TRADES.filter((t) => t.result === "win").length;
-  const total = TRADES.reduce((a, b) => a + b.pnl, 0);
+  // ประวัติจริงจาก MT5 (ราคาเข้า/ออก/กำไร จริง) — ดึงตอนเปิดหน้า + รีเฟรชทุก 15 วิ
+  const [trades, setTrades] = useState<Trade[]>([]);
+  const [stats, setStats] = useState<Stats>({ total: 0, win_rate: 0, net_pnl: 0, best_technique: "—" });
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!isBackendConfigured()) {
+      setLoaded(true);
+      return;
+    }
+    let alive = true;
+    const load = async () => {
+      try {
+        const res = await api.history();
+        if (!alive) return;
+        setTrades(res.trades || []);
+        setStats(res.stats || { total: 0, win_rate: 0, net_pnl: 0, best_technique: "—" });
+      } catch {
+        /* keep last */
+      } finally {
+        if (alive) setLoaded(true);
+      }
+    };
+    load();
+    const iv = setInterval(load, 15000);
+    return () => {
+      alive = false;
+      clearInterval(iv);
+    };
+  }, []);
 
   return (
     <div>
-      <PageHeader title="ประวัติการเทรด" subtitle="ทุกไม้ที่ทีม AI เทรดอัตโนมัติ พร้อมระบุกลยุทธ์ที่ใช้" />
+      <PageHeader title="ประวัติการเทรด" subtitle="ทุกไม้ที่ทีม AI ปิดจริงจาก MT5 พร้อมราคาเข้า/ออกและกลยุทธ์ที่ใช้" />
       <div className="mb-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <Stat label="ไม้ทั้งหมด" value={`${TRADES.length}`} />
-        <Stat label="อัตราชนะ" value={`${Math.round((wins / TRADES.length) * 100)}%`} tone="text-accent-cyan" />
-        <Stat label="กำไร/ขาดทุนสุทธิ" value={`${total >= 0 ? "+" : ""}${fmtMoney(total)}`} tone={total >= 0 ? "text-up" : "text-down"} />
-        <Stat label="กลยุทธ์ดีที่สุด" value="SMC" tone="text-brand" />
+        <Stat label="ไม้ทั้งหมด" value={`${stats.total}`} />
+        <Stat label="อัตราชนะ" value={`${stats.win_rate}%`} tone="text-accent-cyan" />
+        <Stat label="กำไร/ขาดทุนสุทธิ" value={`${stats.net_pnl >= 0 ? "+" : ""}${fmtMoney(stats.net_pnl)}`} tone={stats.net_pnl >= 0 ? "text-up" : "text-down"} />
+        <Stat label="กลยุทธ์ดีที่สุด" value={stats.best_technique} tone="text-brand" />
       </div>
 
       <div className="glass overflow-x-auto p-0">
@@ -29,7 +72,7 @@ export default function HistoryPage() {
             </tr>
           </thead>
           <tbody>
-            {TRADES.map((t, i) => (
+            {trades.map((t, i) => (
               <motion.tr key={t.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }} className="border-b border-white/[0.04] hover:bg-white/[0.02]">
                 <td className="px-4 py-3 font-semibold text-white">{t.symbol}</td>
                 <td className="px-4 py-3">
@@ -39,13 +82,20 @@ export default function HistoryPage() {
                 <td className="px-4 py-3 font-mono text-muted">{fmtNumber(t.entry)}</td>
                 <td className="px-4 py-3 font-mono text-muted">{fmtNumber(t.exit)}</td>
                 <td className={`px-4 py-3 font-mono font-bold ${t.pnl >= 0 ? "text-up" : "text-down"}`}>{t.pnl >= 0 ? "+" : ""}{fmtMoney(t.pnl)}</td>
-                <td className="px-4 py-3 text-muted">{t.strategy}</td>
+                <td className="px-4 py-3 text-muted">{t.technique}</td>
                 <td className="px-4 py-3">
                   <span className={`chip text-[10px] font-bold uppercase ${t.result === "win" ? "border-accent-green/30 bg-accent-green/10 text-accent-green" : "border-accent-red/30 bg-accent-red/10 text-accent-red"}`}>{t.result === "win" ? "ชนะ" : "แพ้"}</span>
                 </td>
-                <td className="px-4 py-3 text-muted">{new Date(t.closedAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</td>
+                <td className="px-4 py-3 text-muted">{t.closed_at ? new Date(t.closed_at * 1000).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "—"}</td>
               </motion.tr>
             ))}
+            {loaded && trades.length === 0 && (
+              <tr>
+                <td colSpan={9} className="px-4 py-10 text-center text-muted">
+                  ยังไม่มีไม้ที่ปิดในช่วง 30 วันที่ผ่านมา
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
