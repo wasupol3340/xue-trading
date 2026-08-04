@@ -30,11 +30,11 @@ export default function BacktestPage() {
 
   return (
     <div>
-      <PageHeader title="Backtesting" subtitle="Simulate any strategy over historical XAUUSD data before the AI deploys capital." />
+      <PageHeader title="ทดสอบย้อนหลัง" subtitle="จำลองกลยุทธ์ใดก็ได้บนข้อมูล XAUUSD ในอดีต ก่อนที่ AI จะลงเงินจริง" />
 
       <div className="glass mb-5 flex flex-wrap items-end gap-4 p-4">
         <div>
-          <label className="panel-title mb-1.5 block">Strategy</label>
+          <label className="panel-title mb-1.5 block">กลยุทธ์</label>
           <select value={strategy} onChange={(e) => setStrategy(e.target.value)} className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white focus:outline-none">
             {STRATEGIES.map((s) => (
               <option key={s.id} value={s.id} className="bg-bg-panel">
@@ -44,7 +44,7 @@ export default function BacktestPage() {
           </select>
         </div>
         <div>
-          <label className="panel-title mb-1.5 block">Timeframe</label>
+          <label className="panel-title mb-1.5 block">ไทม์เฟรม</label>
           <select className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white focus:outline-none">
             {["M15", "H1", "H4", "D1"].map((t) => (
               <option key={t} className="bg-bg-panel">{t}</option>
@@ -52,21 +52,21 @@ export default function BacktestPage() {
           </select>
         </div>
         <div>
-          <label className="panel-title mb-1.5 block">Period</label>
+          <label className="panel-title mb-1.5 block">ช่วงเวลา</label>
           <select className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white focus:outline-none">
-            {["3 Months", "6 Months", "1 Year", "3 Years"].map((t) => (
+            {["3 เดือน", "6 เดือน", "1 ปี", "3 ปี"].map((t) => (
               <option key={t} className="bg-bg-panel">{t}</option>
             ))}
           </select>
         </div>
         <button onClick={() => setRunning((r) => !r)} className="btn-primary ml-auto">
-          <Play className="h-4 w-4" /> Run Backtest
+          <Play className="h-4 w-4" /> เริ่มทดสอบ
         </button>
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_260px]">
         <div className="glass p-4">
-          <h3 className="panel-title mb-3">Equity Curve</h3>
+          <h3 className="panel-title mb-3">เส้นอิควิตี้</h3>
           <ResponsiveContainer width="100%" height={320}>
             <AreaChart data={data}>
               <defs>
@@ -85,12 +85,12 @@ export default function BacktestPage() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <Metric label="Net Return" value={`${+ret >= 0 ? "+" : ""}${ret}%`} tone={+ret >= 0 ? "text-up" : "text-down"} />
-          <Metric label="Final Equity" value={`$${final.toFixed(0)}`} tone="text-accent-cyan" />
-          <Metric label="Max Drawdown" value={`${maxDd}%`} tone="text-down" />
+          <Metric label="ผลตอบแทนสุทธิ" value={`${+ret >= 0 ? "+" : ""}${ret}%`} tone={+ret >= 0 ? "text-up" : "text-down"} />
+          <Metric label="อิควิตี้สุดท้าย" value={`$${final.toFixed(0)}`} tone="text-accent-cyan" />
+          <Metric label="Drawdown สูงสุด" value={`${maxDd}%`} tone="text-down" />
           <Metric label="Profit Factor" value={STRATEGIES.find((s) => s.id === strategy)!.profitFactor.toFixed(2)} tone="text-white" />
           <Metric label="Sharpe Ratio" value={STRATEGIES.find((s) => s.id === strategy)!.sharpe.toFixed(2)} tone="text-brand" />
-          <Metric label="Win Rate" value={`${STRATEGIES.find((s) => s.id === strategy)!.winRate}%`} tone="text-accent-violet" />
+          <Metric label="อัตราชนะ" value={`${STRATEGIES.find((s) => s.id === strategy)!.winRate}%`} tone="text-accent-violet" />
         </div>
       </div>
     </div>

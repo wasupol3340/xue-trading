@@ -16,7 +16,7 @@ export default function LogsPage() {
 
   return (
     <div>
-      <PageHeader title="System Logs" subtitle="Realtime event stream from every AI agent, the risk engine and the MT5 bridge." action={<span className="chip border-accent-green/30 bg-accent-green/10 text-accent-green"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-green" /> Streaming</span>} />
+      <PageHeader title="บันทึกระบบ" subtitle="สตรีมเหตุการณ์แบบเรียลไทม์จาก AI ทุกตัว เครื่องยนต์ความเสี่ยง และตัวเชื่อม MT5" action={<span className="chip border-accent-green/30 bg-accent-green/10 text-accent-green"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-green" /> กำลังสตรีม</span>} />
       <div className="glass p-4 font-mono text-[13px]">
         <div className="space-y-1.5">
           {logs.map((l, i) => (

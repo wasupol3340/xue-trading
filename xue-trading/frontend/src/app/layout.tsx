@@ -7,9 +7,9 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swa
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "XUE Trading — Autonomous AI Trading Platform",
+  title: "XUE Trading — แพลตฟอร์มเทรดอัตโนมัติด้วย AI",
   description:
-    "Enterprise-grade autonomous AI trading platform. 8 specialized AI agents run market research, strategy, risk and execution on XAUUSD via MetaTrader 5.",
+    "แพลตฟอร์มเทรดอัตโนมัติด้วย AI ระดับองค์กร ทีม AI เฉพาะทาง 8 ตัวทำงานวิจัยตลาด กลยุทธ์ ความเสี่ยง และการเข้าเทรด XAUUSD ผ่าน MetaTrader 5",
   keywords: ["AI trading", "XAUUSD", "MT5", "SMC", "ICT", "algorithmic trading", "fintech"],
 };
 

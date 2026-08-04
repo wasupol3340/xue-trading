@@ -44,44 +44,44 @@ export default function SettingsPage() {
 
   return (
     <div>
-      <PageHeader title="Settings" subtitle="Account, MT5 bridge, risk limits and autonomous execution controls." action={<button className="btn-primary">Save Changes</button>} />
+      <PageHeader title="ตั้งค่า" subtitle="บัญชี ตัวเชื่อม MT5 ขีดจำกัดความเสี่ยง และการควบคุมการเทรดอัตโนมัติ" action={<button className="btn-primary">บันทึกการเปลี่ยนแปลง</button>} />
 
       <div className="grid gap-5 lg:grid-cols-2">
-        <Section icon={<User className="h-5 w-5" />} title="Account" desc="Profile & security">
+        <Section icon={<User className="h-5 w-5" />} title="บัญชี" desc="โปรไฟล์และความปลอดภัย">
           <div className="grid gap-4">
-            <Field label="Display Name" value="XUE Master" />
-            <Field label="Email" value="master@xuetrading.ai" />
-            <Field label="Password" placeholder="••••••••" />
+            <Field label="ชื่อที่แสดง" value="XUE Master" />
+            <Field label="อีเมล" value="master@xuetrading.ai" />
+            <Field label="รหัสผ่าน" placeholder="••••••••" />
           </div>
         </Section>
 
-        <Section icon={<Server className="h-5 w-5" />} title="MetaTrader 5 Connection" desc="Broker bridge via MetaTrader5 Python API">
+        <Section icon={<Server className="h-5 w-5" />} title="การเชื่อมต่อ MetaTrader 5" desc="ตัวเชื่อมโบรกเกอร์ผ่าน MetaTrader5 Python API">
           <div className="grid gap-4">
-            <Field label="Login" value="51234567" />
-            <Field label="Server" value="MetaQuotes-Demo" />
-            <Field label="Password" placeholder="••••••••" />
+            <Field label="ล็อกอิน" value="51234567" />
+            <Field label="เซิร์ฟเวอร์" value="MetaQuotes-Demo" />
+            <Field label="รหัสผ่าน" placeholder="••••••••" />
             <div className="flex items-center gap-2 rounded-xl border border-accent-green/20 bg-accent-green/5 px-3 py-2 text-xs text-accent-green">
-              <Wifi className="h-4 w-4" /> Connected · latency 41ms
+              <Wifi className="h-4 w-4" /> เชื่อมต่อแล้ว · ดีเลย์ 41ms
             </div>
           </div>
         </Section>
 
-        <Section icon={<ShieldAlert className="h-5 w-5" />} title="Risk Management" desc="Hard limits enforced by Risk AI">
+        <Section icon={<ShieldAlert className="h-5 w-5" />} title="การจัดการความเสี่ยง" desc="ขีดจำกัดที่บังคับใช้โดย Risk AI">
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Risk per Trade (%)" value="5" />
-            <Field label="Max Drawdown (%)" value="20" />
-            <Field label="Daily Loss Limit (%)" value="8" />
-            <Field label="Weekly Loss Limit (%)" value="15" />
-            <Field label="Max Exposure (lots)" value="1.0" />
+            <Field label="ความเสี่ยงต่อไม้ (%)" value="5" />
+            <Field label="Drawdown สูงสุด (%)" value="20" />
+            <Field label="ขีดจำกัดขาดทุนรายวัน (%)" value="8" />
+            <Field label="ขีดจำกัดขาดทุนรายสัปดาห์ (%)" value="15" />
+            <Field label="ขนาดสถานะสูงสุด (ล็อต)" value="1.0" />
             <Field label="Magic Number" value="20260803" />
           </div>
         </Section>
 
-        <Section icon={<Bot className="h-5 w-5" />} title="Autonomous Execution" desc="AI acts without confirmation">
+        <Section icon={<Bot className="h-5 w-5" />} title="การเทรดอัตโนมัติ" desc="AI ทำงานโดยไม่ต้องยืนยัน">
           <div className="space-y-4">
-            <Row label="Auto Trading" desc="AI opens & closes trades automatically" on={auto} onClick={() => setAuto(!auto)} />
-            <Row label="Trailing Stop" desc="Trail SL as trade moves in profit" on={trailing} onClick={() => setTrailing(!trailing)} />
-            <Row label="News Filter" desc="Pause execution around high-impact news" on={news} onClick={() => setNews(!news)} />
+            <Row label="เทรดอัตโนมัติ" desc="AI เปิดและปิดไม้โดยอัตโนมัติ" on={auto} onClick={() => setAuto(!auto)} />
+            <Row label="Trailing Stop" desc="เลื่อน SL ตามเมื่อไม้มีกำไรมากขึ้น" on={trailing} onClick={() => setTrailing(!trailing)} />
+            <Row label="ตัวกรองข่าว" desc="หยุดเทรดชั่วคราวรอบข่าวที่มีผลกระทบสูง" on={news} onClick={() => setNews(!news)} />
           </div>
         </Section>
       </div>

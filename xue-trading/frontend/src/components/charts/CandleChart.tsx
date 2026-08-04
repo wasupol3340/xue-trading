@@ -160,7 +160,7 @@ export function CandleChart({ candles, markers = [], current, height = 380 }: Pr
           const isSell = m.type === "SELL";
           const color = m.type === "SELL" ? "#ef4444" : m.type === "BUY_STRONG" ? "#22c55e" : "#3b82f6";
           const yOff = isSell ? -30 : 22;
-          const label = m.type === "BUY_STRONG" ? "BUY STRONG" : m.type;
+          const label = m.type === "BUY_STRONG" ? "ซื้อแรง" : m.type === "SELL" ? "ขาย" : "ซื้อ";
           return (
             <g key={`mk${i}`}>
               <line x1={cx} x2={cx} y1={cy} y2={cy + (isSell ? -14 : 14)} stroke={color} strokeWidth={1.4} />
@@ -175,7 +175,7 @@ export function CandleChart({ candles, markers = [], current, height = 380 }: Pr
         })}
       </svg>
       <div className="pointer-events-none absolute right-3 top-2 flex items-center gap-1.5 text-[11px] text-accent-green">
-        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-green" /> Real-time
+        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-green" /> เรียลไทม์
       </div>
     </div>
   );

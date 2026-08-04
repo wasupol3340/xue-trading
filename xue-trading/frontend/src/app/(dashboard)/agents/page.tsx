@@ -13,12 +13,12 @@ export default function AgentsPage() {
 
   return (
     <div>
-      <PageHeader title="AI Agents" subtitle="Monitor & configure each specialized trading agent in real time." />
+      <PageHeader title="ทีม AI" subtitle="ติดตามและตั้งค่า AI เทรดเฉพาะทางแต่ละตัวแบบเรียลไทม์" />
       <div className="mb-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <Stat label="Agents Online" value="8 / 8" tone="text-accent-green" />
-        <Stat label="Avg Confidence" value={`${avgConf}%`} tone="text-accent-cyan" />
-        <Stat label="Avg CPU Load" value={`${avgCpu}%`} tone="text-brand" />
-        <Stat label="System Health" value="99.9%" tone="text-accent-violet" />
+        <Stat label="AI ที่ออนไลน์" value="8 / 8" tone="text-accent-green" />
+        <Stat label="ความมั่นใจเฉลี่ย" value={`${avgConf}%`} tone="text-accent-cyan" />
+        <Stat label="โหลด CPU เฉลี่ย" value={`${avgCpu}%`} tone="text-brand" />
+        <Stat label="สุขภาพระบบ" value="99.9%" tone="text-accent-violet" />
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {agents.map((a, i) => (

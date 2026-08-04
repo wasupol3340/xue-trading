@@ -12,13 +12,13 @@ export function PortfolioPanel() {
 
   return (
     <div className="flex flex-col gap-4">
-      <Panel title="Portfolio Overview" delay={0.1}>
+      <Panel title="ภาพรวมพอร์ตโฟลิโอ" delay={0.1}>
         <div className="flex items-center gap-4">
-          <RadialProgress value={p.profitPct} label={`${p.profitPct}%`} sublabel="Equity" color="#3b82f6" size={104} />
+          <RadialProgress value={p.profitPct} label={`${p.profitPct}%`} sublabel="อิควิตี้" color="#3b82f6" size={104} />
           <div className="flex-1 space-y-2.5">
-            <Row label="Balance" value={fmtMoney(p.balance)} />
-            <Row label="Equity" value={fmtMoney(p.equity)} />
-            <Row label="Profit" value={`${fmtSignedMoney(p.profit)} (${fmtPct(p.profitPct)})`} className={signCls(p.profit)} />
+            <Row label="ยอดเงิน" value={fmtMoney(p.balance)} />
+            <Row label="อิควิตี้" value={fmtMoney(p.equity)} />
+            <Row label="กำไร" value={`${fmtSignedMoney(p.profit)} (${fmtPct(p.profitPct)})`} className={signCls(p.profit)} />
             <Row label="Drawdown" value={fmtPct(-p.drawdown)} className="text-down" />
           </div>
         </div>
@@ -28,14 +28,14 @@ export function PortfolioPanel() {
         <Panel delay={0.15}>
           <div className="flex items-center gap-2 text-muted">
             <Briefcase className="h-4 w-4" />
-            <span className="text-[11px] font-semibold uppercase tracking-wider">Open Positions</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider">ไม้ที่เปิด</span>
           </div>
           <p className="mt-2 stat-value">{p.openPositions}</p>
         </Panel>
         <Panel delay={0.2}>
           <div className="flex items-center gap-2 text-muted">
             <TrendingUp className="h-4 w-4" />
-            <span className="text-[11px] font-semibold uppercase tracking-wider">Total Profit</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider">กำไรรวม</span>
           </div>
           <p className={`mt-2 stat-value ${signCls(p.totalProfit)}`}>{fmtSignedMoney(p.totalProfit)}</p>
         </Panel>
@@ -43,7 +43,7 @@ export function PortfolioPanel() {
 
       <Panel delay={0.25}>
         <div className="mb-2 flex items-center justify-between">
-          <span className="panel-title">Risk Meter</span>
+          <span className="panel-title">มิเตอร์ความเสี่ยง</span>
           <span className="font-mono text-sm font-semibold text-brand">{p.riskMeter.toFixed(2)}%</span>
         </div>
         <RiskMeter value={p.riskMeter} />
@@ -51,11 +51,11 @@ export function PortfolioPanel() {
 
       <div className="grid grid-cols-2 gap-4">
         <Panel delay={0.3}>
-          <span className="panel-title">Win Rate</span>
+          <span className="panel-title">อัตราชนะ</span>
           <p className="mt-2 stat-value text-accent-cyan">{p.winRate}%</p>
         </Panel>
         <Panel delay={0.35}>
-          <span className="panel-title">Today</span>
+          <span className="panel-title">วันนี้</span>
           <p className={`mt-2 stat-value ${signCls(p.todayProfit)}`}>{fmtSignedMoney(p.todayProfit)}</p>
         </Panel>
       </div>

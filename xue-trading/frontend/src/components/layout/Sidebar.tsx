@@ -20,18 +20,18 @@ import {
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/headquarters", label: "AI Headquarters", icon: Building2 },
-  { href: "/agents", label: "AI Agents", icon: Bot },
-  { href: "/research", label: "Research Lab", icon: FlaskConical },
-  { href: "/meeting", label: "Meeting Room", icon: Users },
-  { href: "/portfolio", label: "Portfolio", icon: Wallet },
-  { href: "/strategy", label: "Strategy Center", icon: Brain },
-  { href: "/backtest", label: "Backtesting", icon: LineChart },
-  { href: "/news", label: "Economic News", icon: Newspaper },
-  { href: "/history", label: "Trading History", icon: History },
-  { href: "/logs", label: "System Logs", icon: ScrollText },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/dashboard", label: "แดชบอร์ด", icon: LayoutDashboard },
+  { href: "/headquarters", label: "สำนักงานใหญ่ AI", icon: Building2 },
+  { href: "/agents", label: "ทีม AI", icon: Bot },
+  { href: "/research", label: "ห้องวิจัย", icon: FlaskConical },
+  { href: "/meeting", label: "ห้องประชุม", icon: Users },
+  { href: "/portfolio", label: "พอร์ตโฟลิโอ", icon: Wallet },
+  { href: "/strategy", label: "ศูนย์กลยุทธ์", icon: Brain },
+  { href: "/backtest", label: "ทดสอบย้อนหลัง", icon: LineChart },
+  { href: "/news", label: "ข่าวเศรษฐกิจ", icon: Newspaper },
+  { href: "/history", label: "ประวัติการเทรด", icon: History },
+  { href: "/logs", label: "บันทึกระบบ", icon: ScrollText },
+  { href: "/settings", label: "ตั้งค่า", icon: Settings },
 ];
 
 export function Sidebar() {
@@ -47,7 +47,7 @@ export function Sidebar() {
           <p className="text-[15px] font-bold tracking-wide text-white">
             XUE <span className="text-gradient-gold">TRADING</span>
           </p>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-muted">AI Autonomous</p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-muted">AI อัตโนมัติ</p>
         </div>
       </Link>
 
@@ -80,10 +80,10 @@ export function Sidebar() {
       </nav>
 
       <div className="mt-4 rounded-xl border border-white/[0.06] bg-gradient-to-br from-accent-violet/10 to-accent-cyan/5 p-3">
-        <p className="text-[11px] font-semibold text-white">AI Agent Center</p>
-        <p className="mt-0.5 text-[11px] text-muted">8 / 8 agents online · autonomous</p>
+        <p className="text-[11px] font-semibold text-white">ศูนย์ควบคุม AI</p>
+        <p className="mt-0.5 text-[11px] text-muted">8 / 8 เอเจนต์ออนไลน์ · อัตโนมัติ</p>
         <Link href="/headquarters" className="mt-2 inline-flex text-[11px] font-semibold text-brand hover:underline">
-          Manage & Configure →
+          จัดการ &amp; ตั้งค่า →
         </Link>
       </div>
     </aside>

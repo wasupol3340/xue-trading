@@ -33,7 +33,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ authed: true, loading: false });
       return true;
     } catch (e: any) {
-      set({ loading: false, error: e?.message || "Login failed" });
+      set({ loading: false, error: e?.message || "เข้าสู่ระบบไม่สำเร็จ" });
       return false;
     }
   },

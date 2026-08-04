@@ -11,19 +11,19 @@ export default function HistoryPage() {
 
   return (
     <div>
-      <PageHeader title="Trading History" subtitle="Every autonomous trade executed by the AI company, with attributed strategy." />
+      <PageHeader title="ประวัติการเทรด" subtitle="ทุกไม้ที่ทีม AI เทรดอัตโนมัติ พร้อมระบุกลยุทธ์ที่ใช้" />
       <div className="mb-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <Stat label="Total Trades" value={`${TRADES.length}`} />
-        <Stat label="Win Rate" value={`${Math.round((wins / TRADES.length) * 100)}%`} tone="text-accent-cyan" />
-        <Stat label="Net P/L" value={`${total >= 0 ? "+" : ""}${fmtMoney(total)}`} tone={total >= 0 ? "text-up" : "text-down"} />
-        <Stat label="Best Strategy" value="SMC" tone="text-brand" />
+        <Stat label="ไม้ทั้งหมด" value={`${TRADES.length}`} />
+        <Stat label="อัตราชนะ" value={`${Math.round((wins / TRADES.length) * 100)}%`} tone="text-accent-cyan" />
+        <Stat label="กำไร/ขาดทุนสุทธิ" value={`${total >= 0 ? "+" : ""}${fmtMoney(total)}`} tone={total >= 0 ? "text-up" : "text-down"} />
+        <Stat label="กลยุทธ์ดีที่สุด" value="SMC" tone="text-brand" />
       </div>
 
       <div className="glass overflow-x-auto p-0">
         <table className="w-full min-w-[820px] text-left text-sm">
           <thead>
             <tr className="border-b border-white/[0.06] text-[11px] uppercase tracking-wider text-muted">
-              {["Symbol", "Side", "Lots", "Entry", "Exit", "P/L", "Strategy", "Result", "Closed"].map((h) => (
+              {["สัญลักษณ์", "ฝั่ง", "ล็อต", "ราคาเข้า", "ราคาออก", "กำไร/ขาดทุน", "กลยุทธ์", "ผล", "ปิดเมื่อ"].map((h) => (
                 <th key={h} className="px-4 py-3 font-semibold">{h}</th>
               ))}
             </tr>
@@ -41,7 +41,7 @@ export default function HistoryPage() {
                 <td className={`px-4 py-3 font-mono font-bold ${t.pnl >= 0 ? "text-up" : "text-down"}`}>{t.pnl >= 0 ? "+" : ""}{fmtMoney(t.pnl)}</td>
                 <td className="px-4 py-3 text-muted">{t.strategy}</td>
                 <td className="px-4 py-3">
-                  <span className={`chip text-[10px] font-bold uppercase ${t.result === "win" ? "border-accent-green/30 bg-accent-green/10 text-accent-green" : "border-accent-red/30 bg-accent-red/10 text-accent-red"}`}>{t.result}</span>
+                  <span className={`chip text-[10px] font-bold uppercase ${t.result === "win" ? "border-accent-green/30 bg-accent-green/10 text-accent-green" : "border-accent-red/30 bg-accent-red/10 text-accent-red"}`}>{t.result === "win" ? "ชนะ" : "แพ้"}</span>
                 </td>
                 <td className="px-4 py-3 text-muted">{new Date(t.closedAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</td>
               </motion.tr>

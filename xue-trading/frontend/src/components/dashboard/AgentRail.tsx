@@ -26,8 +26,8 @@ export function AgentRail() {
   return (
     <div className="glass flex h-full flex-col p-3">
       <div className="mb-3 flex items-center justify-between px-1">
-        <h3 className="panel-title">AI Agents</h3>
-        <span className="chip border-accent-green/30 bg-accent-green/10 text-accent-green">8/8 Online</span>
+        <h3 className="panel-title">ทีม AI</h3>
+        <span className="chip border-accent-green/30 bg-accent-green/10 text-accent-green">8/8 ออนไลน์</span>
       </div>
       <div className="flex flex-1 flex-col gap-2 overflow-y-auto pr-0.5">
         {agents.map((a, i) => (

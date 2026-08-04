@@ -6,26 +6,26 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { RadialProgress } from "@/components/ui/RadialProgress";
 
 const CONCEPTS = [
-  { icon: Boxes, name: "Order Blocks", desc: "Institutional accumulation zones on HTF", conf: 89, color: "#3b82f6" },
-  { icon: GitBranch, name: "Fair Value Gap", desc: "Price imbalance likely to be rebalanced", conf: 82, color: "#8b5cf6" },
-  { icon: Droplets, name: "Liquidity Pools", desc: "Resting stops above/below equal highs-lows", conf: 85, color: "#22d3ee" },
-  { icon: Layers, name: "Market Structure", desc: "BOS / CHoCH bias detection on M15–H4", conf: 91, color: "#f0b429" },
-  { icon: Waves, name: "Wyckoff Phase", desc: "Accumulation / distribution schematic", conf: 80, color: "#2dd4bf" },
-  { icon: Target, name: "Premium / Discount", desc: "Optimal Trade Entry within dealing range", conf: 87, color: "#f6ad55" },
+  { icon: Boxes, name: "Order Blocks", desc: "โซนสะสมของสถาบันบนไทม์เฟรมใหญ่", conf: 89, color: "#3b82f6" },
+  { icon: GitBranch, name: "Fair Value Gap", desc: "ความไม่สมดุลของราคาที่มักถูกเติมเต็ม", conf: 82, color: "#8b5cf6" },
+  { icon: Droplets, name: "Liquidity Pools", desc: "จุด stop ที่ค้างอยู่เหนือ/ใต้จุดสูง-ต่ำที่เท่ากัน", conf: 85, color: "#22d3ee" },
+  { icon: Layers, name: "Market Structure", desc: "ตรวจจับทิศทาง BOS / CHoCH บน M15–H4", conf: 91, color: "#f0b429" },
+  { icon: Waves, name: "Wyckoff Phase", desc: "แผนภาพการสะสม / กระจายของ Wyckoff", conf: 80, color: "#2dd4bf" },
+  { icon: Target, name: "Premium / Discount", desc: "จุดเข้าเทรดที่ดีที่สุดในกรอบราคา", conf: 87, color: "#f6ad55" },
 ];
 
 export default function ResearchPage() {
   return (
     <div>
-      <PageHeader title="Research Lab" subtitle="Research AI decomposes the market into SMC & ICT concepts and scores each in real time." />
+      <PageHeader title="ห้องวิจัย" subtitle="Research AI แยกตลาดออกเป็นแนวคิด SMC และ ICT พร้อมให้คะแนนแต่ละอย่างแบบเรียลไทม์" />
 
       <div className="mb-5 glass p-5">
-        <h3 className="panel-title mb-3">Current Market Thesis · XAUUSD</h3>
+        <h3 className="panel-title mb-3">มุมมองตลาดปัจจุบัน · XAUUSD</h3>
         <p className="text-sm leading-relaxed text-white/85">
-          Higher-timeframe structure is <span className="font-semibold text-accent-green">bullish</span>. Price swept sell-side liquidity into a
-          demand <span className="font-semibold text-accent-blue">order block</span> at 2,318 and left an unfilled{" "}
-          <span className="font-semibold text-accent-violet">fair value gap</span> at 2,331. Bias favors longs targeting buy-side liquidity resting
-          above 2,352, invalidation below 2,314. Confluence with the London session and post-NFP volatility raises the model&apos;s conviction.
+          โครงสร้างในไทม์เฟรมใหญ่เป็น <span className="font-semibold text-accent-green">ขาขึ้น</span> ราคากวาด sell-side liquidity เข้าสู่
+          demand <span className="font-semibold text-accent-blue">order block</span> ที่ 2,318 และทิ้ง{" "}
+          <span className="font-semibold text-accent-violet">fair value gap</span> ที่ยังไม่ถูกเติมไว้ที่ 2,331 ทิศทางเอนไปทางฝั่งซื้อ โดยเล็งไปที่ buy-side liquidity ที่ค้างอยู่
+          เหนือ 2,352 และจะผิดทางหากหลุดใต้ 2,314 การมาบรรจบกับช่วง London session และความผันผวนหลัง NFP ยิ่งเพิ่มความมั่นใจของโมเดล
         </p>
       </div>
 

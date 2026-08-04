@@ -13,8 +13,8 @@ export function EconomicNewsPanel() {
   return (
     <div className="glass flex flex-col p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="panel-title">Economic News</h3>
-        <button className="text-[11px] font-semibold text-accent-cyan hover:underline">View All</button>
+        <h3 className="panel-title">ข่าวเศรษฐกิจ</h3>
+        <button className="text-[11px] font-semibold text-accent-cyan hover:underline">ดูทั้งหมด</button>
       </div>
       <div className="flex flex-col divide-y divide-white/[0.05]">
         {NEWS.map((n) => (
@@ -26,10 +26,10 @@ export function EconomicNewsPanel() {
               <p className="truncate text-[12px] font-medium text-white">{n.title}</p>
               {n.actual && n.actual !== "—" && (
                 <p className="text-[10px] text-muted">
-                  Actual: <span className="text-white">{n.actual}</span> · Forecast: {n.forecast}
+                  ค่าจริง: <span className="text-white">{n.actual}</span> · คาดการณ์: {n.forecast}
                 </p>
               )}
-              {n.impact === "high" && n.actual === "—" && <p className="text-[10px] font-semibold text-accent-red">High Impact</p>}
+              {n.impact === "high" && n.actual === "—" && <p className="text-[10px] font-semibold text-accent-red">ผลกระทบสูง</p>}
             </div>
             <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: impactColor[n.impact], boxShadow: `0 0 8px ${impactColor[n.impact]}88` }} />
           </div>

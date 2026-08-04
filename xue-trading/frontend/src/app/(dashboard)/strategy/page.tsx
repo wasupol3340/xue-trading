@@ -26,24 +26,24 @@ export default function StrategyPage() {
   return (
     <div>
       <PageHeader
-        title="Strategy Center"
-        subtitle="Self-learning engine — Learning AI updates each strategy's score, win-rate, profit factor, Sharpe & drawdown automatically."
-        action={<span className="chip border-accent-violet/30 bg-accent-violet/10 text-accent-violet">Reinforcement Learning · Live</span>}
+        title="ศูนย์กลยุทธ์"
+        subtitle="เครื่องยนต์เรียนรู้ด้วยตัวเอง — Learning AI อัปเดตคะแนน อัตราชนะ profit factor Sharpe และ drawdown ของแต่ละกลยุทธ์โดยอัตโนมัติ"
+        action={<span className="chip border-accent-violet/30 bg-accent-violet/10 text-accent-violet">Reinforcement Learning · สด</span>}
       />
 
       <div className="glass overflow-x-auto p-0">
         <table className="w-full min-w-[820px] text-left text-sm">
           <thead>
             <tr className="border-b border-white/[0.06] text-[11px] uppercase tracking-wider text-muted">
-              <th className="px-4 py-3 font-semibold">Strategy</th>
-              <th className="px-4 py-3 font-semibold">Score</th>
-              <th className="px-4 py-3 font-semibold">Confidence</th>
-              <th className="px-4 py-3 font-semibold">Win Rate</th>
+              <th className="px-4 py-3 font-semibold">กลยุทธ์</th>
+              <th className="px-4 py-3 font-semibold">คะแนน</th>
+              <th className="px-4 py-3 font-semibold">ความมั่นใจ</th>
+              <th className="px-4 py-3 font-semibold">อัตราชนะ</th>
               <th className="px-4 py-3 font-semibold">Profit Factor</th>
               <th className="px-4 py-3 font-semibold">Sharpe</th>
               <th className="px-4 py-3 font-semibold">Max DD</th>
-              <th className="px-4 py-3 font-semibold">Trades</th>
-              <th className="px-4 py-3 font-semibold">Status</th>
+              <th className="px-4 py-3 font-semibold">ไม้</th>
+              <th className="px-4 py-3 font-semibold">สถานะ</th>
             </tr>
           </thead>
           <tbody>
@@ -64,7 +64,7 @@ export default function StrategyPage() {
                     </span>
                     {s.id === currentTechnique && (
                       <span className="chip border-accent-green/40 bg-accent-green/10 text-[9px] font-bold text-accent-green">
-                        ● TRADING NOW
+                        ● กำลังเทรด
                       </span>
                     )}
                   </div>
@@ -87,7 +87,7 @@ export default function StrategyPage() {
                 <td className="px-4 py-3 font-mono text-muted">{s.trades}</td>
                 <td className="px-4 py-3">
                   <span className={`chip text-[10px] ${s.enabled ? "border-accent-green/30 bg-accent-green/10 text-accent-green" : "text-muted"}`}>
-                    {s.enabled ? "Active" : "Paused"}
+                    {s.enabled ? "ทำงานอยู่" : "หยุดชั่วคราว"}
                   </span>
                 </td>
               </motion.tr>

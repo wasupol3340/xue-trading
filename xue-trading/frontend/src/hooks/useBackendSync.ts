@@ -61,10 +61,10 @@ function mapMeeting(dec: any): Meeting {
     agent: role as any,
     time: new Date().toLocaleTimeString("en-GB"),
     text:
-      role === "News" ? "Parsing macro sentiment for gold."
-      : role === "Risk" ? "Checking exposure & drawdown limits."
-      : role === "Strategy" ? `Trade plan via ${dec.technique_name || "SMC"}.`
-      : `${role} vote registered.`,
+      role === "News" ? "กำลังวิเคราะห์อารมณ์ตลาดมหภาคของทองคำ"
+      : role === "Risk" ? "กำลังตรวจสอบขีดจำกัดความเสี่ยงและ drawdown"
+      : role === "Strategy" ? `แผนเทรดผ่าน ${dec.technique_name || "SMC"}`
+      : `บันทึกโหวตของ ${role} แล้ว`,
     vote: vote as Vote,
   }));
   return {

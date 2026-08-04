@@ -42,8 +42,8 @@ export function TradeControls() {
 
   return (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-      <Stepper label="Lot Size" value={lotSize.toFixed(2)} onDec={() => setLotSize(lotSize - 0.01)} onInc={() => setLotSize(lotSize + 0.01)} />
-      <Stepper label="Risk Level" value={`${riskLevel}`} suffix="%" onDec={() => setRiskLevel(riskLevel - 1)} onInc={() => setRiskLevel(riskLevel + 1)} />
+      <Stepper label="ขนาดล็อต" value={lotSize.toFixed(2)} onDec={() => setLotSize(lotSize - 0.01)} onInc={() => setLotSize(lotSize + 0.01)} />
+      <Stepper label="ระดับความเสี่ยง" value={`${riskLevel}`} suffix="%" onDec={() => setRiskLevel(riskLevel - 1)} onInc={() => setRiskLevel(riskLevel + 1)} />
 
       <div className="glass p-3">
         <span className="panel-title">Take Profit</span>
@@ -68,9 +68,9 @@ export function TradeControls() {
           autoTrading ? "border-accent-violet/40 bg-gradient-to-br from-accent-violet/25 to-accent-cyan/15" : "border-white/10 bg-white/[0.02]"
         )}
       >
-        <span className="text-[11px] font-bold uppercase tracking-wider text-white">Auto Trading</span>
+        <span className="text-[11px] font-bold uppercase tracking-wider text-white">เทรดอัตโนมัติ</span>
         <div className="flex items-center gap-2">
-          <span className={cn("text-sm font-bold", autoTrading ? "text-accent-green" : "text-muted")}>{autoTrading ? "ON" : "OFF"}</span>
+          <span className={cn("text-sm font-bold", autoTrading ? "text-accent-green" : "text-muted")}>{autoTrading ? "เปิด" : "ปิด"}</span>
           <span className={cn("relative h-5 w-9 rounded-full transition-colors", autoTrading ? "bg-accent-green/80" : "bg-white/10")}>
             <motion.span layout className="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow" style={{ left: autoTrading ? 18 : 2 }} />
           </span>

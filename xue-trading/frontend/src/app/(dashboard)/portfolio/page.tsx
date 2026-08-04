@@ -9,14 +9,14 @@ export default function PortfolioPage() {
   const p = PORTFOLIO;
   return (
     <div>
-      <PageHeader title="Portfolio" subtitle="Live account equity, open positions and risk exposure." />
+      <PageHeader title="พอร์ตโฟลิโอ" subtitle="อิควิตี้บัญชีแบบสด ไม้ที่เปิด และความเสี่ยงที่รับอยู่" />
 
       <div className="mb-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-        <Stat label="Balance" value={fmtMoney(p.balance)} />
-        <Stat label="Equity" value={fmtMoney(p.equity)} tone="text-accent-cyan" />
-        <Stat label="Total Profit" value={`+${fmtMoney(p.totalProfit)}`} tone="text-up" />
-        <Stat label="Today" value={`+${fmtMoney(p.todayProfit)}`} tone="text-up" />
-        <Stat label="Win Rate" value={`${p.winRate}%`} tone="text-accent-violet" />
+        <Stat label="ยอดเงิน" value={fmtMoney(p.balance)} />
+        <Stat label="อิควิตี้" value={fmtMoney(p.equity)} tone="text-accent-cyan" />
+        <Stat label="กำไรรวม" value={`+${fmtMoney(p.totalProfit)}`} tone="text-up" />
+        <Stat label="วันนี้" value={`+${fmtMoney(p.todayProfit)}`} tone="text-up" />
+        <Stat label="อัตราชนะ" value={`${p.winRate}%`} tone="text-accent-violet" />
         <Stat label="Drawdown" value={`${p.drawdown}%`} tone="text-down" />
       </div>
 
@@ -24,7 +24,7 @@ export default function PortfolioPage() {
         <table className="w-full min-w-[760px] text-left text-sm">
           <thead>
             <tr className="border-b border-white/[0.06] text-[11px] uppercase tracking-wider text-muted">
-              {["Symbol", "Side", "Lots", "Entry", "Current", "SL", "TP", "P/L", "Opened", "Magic"].map((h) => (
+              {["สัญลักษณ์", "ฝั่ง", "ล็อต", "ราคาเข้า", "ปัจจุบัน", "SL", "TP", "กำไร/ขาดทุน", "เปิดเมื่อ", "Magic"].map((h) => (
                 <th key={h} className="px-4 py-3 font-semibold">{h}</th>
               ))}
             </tr>

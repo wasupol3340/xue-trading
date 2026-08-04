@@ -23,6 +23,9 @@ const agentColor: Record<string, string> = {
   Monitor: "#2dd4bf",
 };
 
+const voteLabel: Record<string, string> = { BUY: "ซื้อ", SELL: "ขาย", WAIT: "รอ" };
+const vLabel = (v: string) => voteLabel[v] ?? v;
+
 export function MeetingTimeline() {
   const meeting = useTradingStore((s) => s.meeting);
 
@@ -30,11 +33,11 @@ export function MeetingTimeline() {
     <div className="glass p-4">
       <div className="mb-4 flex items-center gap-2">
         <Radio className="h-4 w-4 text-accent-cyan" />
-        <h3 className="text-sm font-semibold text-white">AI Meeting Room</h3>
+        <h3 className="text-sm font-semibold text-white">ห้องประชุม AI</h3>
         <span className="chip border-accent-green/30 bg-accent-green/10 text-accent-green">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-green" /> Live Discussion
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-green" /> พูดคุยสด
         </span>
-        <span className="ml-auto text-[11px] text-muted">Every 15 min · cycle {meeting.id}</span>
+        <span className="ml-auto text-[11px] text-muted">ทุก 15 นาที · รอบ {meeting.id}</span>
       </div>
 
       <div className="flex gap-3 overflow-x-auto pb-2">
@@ -56,7 +59,7 @@ export function MeetingTimeline() {
             <p className="text-[11px] leading-snug text-muted">{m.text}</p>
             {m.vote && (
               <span className={`mt-2 inline-block text-[11px] font-bold ${voteStyle[m.vote]}`}>
-                {m.vote === "BUY_STRONG" ? "BUY ✓" : m.vote}
+                {m.vote === "BUY_STRONG" ? "ซื้อ ✓" : vLabel(m.vote)}
               </span>
             )}
           </motion.div>
@@ -75,7 +78,7 @@ export function MeetingTimeline() {
             </svg>
             <span className="absolute inset-0 flex items-center justify-center font-mono text-sm font-bold text-white">{meeting.approved}/{meeting.total}</span>
           </div>
-          <span className="mt-1 text-[10px] uppercase tracking-wider text-muted">Approved</span>
+          <span className="mt-1 text-[10px] uppercase tracking-wider text-muted">อนุมัติแล้ว</span>
         </motion.div>
       </div>
 
@@ -86,8 +89,8 @@ export function MeetingTimeline() {
         className="mt-3 flex items-center justify-center gap-2 rounded-xl border border-accent-green/20 bg-accent-green/5 py-2.5"
       >
         <CheckCircle2 className="h-4 w-4 text-accent-green" />
-        <span className="text-sm font-semibold text-white">All agents agreed to execute trade</span>
-        <span className="text-sm font-bold text-accent-green">· Confidence {meeting.confidence}%</span>
+        <span className="text-sm font-semibold text-white">ทีม AI ทุกตัวเห็นพ้องให้เข้าเทรด</span>
+        <span className="text-sm font-bold text-accent-green">· ความมั่นใจ {meeting.confidence}%</span>
       </motion.div>
     </div>
   );

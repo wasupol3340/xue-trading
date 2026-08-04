@@ -38,12 +38,12 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold text-white">
             XUE <span className="text-gradient-gold">TRADING</span>
           </h1>
-          <p className="mt-1 text-sm text-muted">Autonomous AI Trading Platform</p>
+          <p className="mt-1 text-sm text-muted">แพลตฟอร์มเทรดอัตโนมัติด้วย AI</p>
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-muted">Email</label>
+            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-muted">อีเมล</label>
             <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 focus-within:border-accent-violet/50">
               <Mail className="h-4 w-4 text-muted" />
               <input
@@ -58,7 +58,7 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-muted">Password</label>
+            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-muted">รหัสผ่าน</label>
             <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 focus-within:border-accent-violet/50">
               <Lock className="h-4 w-4 text-muted" />
               <input
@@ -76,20 +76,20 @@ export default function LoginPage() {
 
           <button type="submit" disabled={loading} className="btn-primary w-full">
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
-            {loading ? "Authenticating…" : "Sign in to Terminal"}
+            {loading ? "กำลังเข้าสู่ระบบ…" : "เข้าสู่ระบบ"}
           </button>
         </form>
 
         {!isBackendConfigured() && (
           <div className="mt-4 flex items-start gap-2 rounded-xl border border-accent-cyan/20 bg-accent-cyan/5 p-3 text-[11px] text-muted">
             <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent-cyan" />
-            Demo mode — no backend connected yet. Sign in with anything to explore the UI on sample data.
+            โหมดทดลอง — ยังไม่ได้เชื่อมต่อ backend ล็อกอินด้วยอะไรก็ได้เพื่อสำรวจหน้าจอบนข้อมูลตัวอย่าง
           </div>
         )}
 
         <div className="mt-6 flex items-center justify-center gap-2 text-[11px] text-muted">
           <ShieldCheck className="h-3.5 w-3.5 text-accent-green" />
-          Secured with JWT · Refresh token rotation
+          ปลอดภัยด้วย JWT · หมุนเวียน Refresh token
         </div>
       </motion.div>
     </div>

@@ -42,7 +42,7 @@ export function AgentCard({ agent, index }: { agent: Agent; index: number }) {
       </div>
 
       <p className="mt-3 line-clamp-2 rounded-lg border border-white/[0.05] bg-black/20 p-2 text-[11px] text-muted">
-        <span className="font-semibold text-white/80">Task: </span>
+        <span className="font-semibold text-white/80">งาน: </span>
         {agent.currentTask}
       </p>
 
@@ -52,7 +52,7 @@ export function AgentCard({ agent, index }: { agent: Agent; index: number }) {
       </div>
 
       <div className="mt-3 flex items-center justify-between border-t border-white/[0.06] pt-2.5">
-        <span className="text-[10px] uppercase tracking-wider text-muted">Performance</span>
+        <span className="text-[10px] uppercase tracking-wider text-muted">ประสิทธิภาพ</span>
         <span className="font-mono text-sm font-bold" style={{ color: agent.accent }}>
           {agent.performance}%
         </span>

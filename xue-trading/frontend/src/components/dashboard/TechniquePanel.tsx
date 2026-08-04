@@ -35,8 +35,8 @@ export function TechniquePanel() {
             <Brain className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white">AI Technique Learning</h2>
-            <p className="text-[11px] text-muted">Techniques scored live from real trade results · self-selecting</p>
+            <h2 className="text-lg font-bold text-white">การเรียนรู้เทคนิค AI</h2>
+            <p className="text-[11px] text-muted">ให้คะแนนเทคนิคแบบสดจากผลเทรดจริง · เลือกเองอัตโนมัติ</p>
           </div>
         </div>
         <span
@@ -45,19 +45,19 @@ export function TechniquePanel() {
           }`}
         >
           {engineRunning && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-green" />}
-          {engineRunning ? "Learning Live" : "Idle"}
+          {engineRunning ? "เรียนรู้สด" : "ว่าง"}
         </span>
       </div>
 
       {/* Active technique highlight */}
       <div className="mb-4 flex items-center justify-between rounded-xl border border-accent-violet/20 bg-gradient-to-r from-accent-violet/15 to-transparent px-4 py-3">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">Trading Now With</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">กำลังเทรดด้วย</p>
           <p className="text-xl font-bold text-gradient-gold">{currentTechniqueName || active?.name || "—"}</p>
         </div>
         {active && (
           <div className="text-right">
-            <p className="text-[10px] uppercase tracking-wider text-muted">Score</p>
+            <p className="text-[10px] uppercase tracking-wider text-muted">คะแนน</p>
             <p className="font-mono text-2xl font-bold" style={{ color: scoreColor(active.score) }}>
               {active.score}
             </p>
@@ -69,10 +69,10 @@ export function TechniquePanel() {
       <div className="space-y-1.5">
         <div className="grid grid-cols-[24px_1fr_120px_70px_60px] items-center gap-3 px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted">
           <span>#</span>
-          <span>Technique</span>
-          <span>Score</span>
-          <span className="text-right">Win</span>
-          <span className="text-right">Trades</span>
+          <span>เทคนิค</span>
+          <span>คะแนน</span>
+          <span className="text-right">ชนะ</span>
+          <span className="text-right">ไม้</span>
         </div>
         {sorted.map((s, i) => {
           const isActive = s.id === currentTechnique;
@@ -92,7 +92,7 @@ export function TechniquePanel() {
                 <span className="truncate text-[13px] font-medium text-white">{s.name}</span>
                 {isActive && (
                   <span className="shrink-0 rounded-full border border-accent-green/40 bg-accent-green/10 px-1.5 py-0.5 text-[8px] font-bold text-accent-green">
-                    ● NOW
+                    ● ตอนนี้
                   </span>
                 )}
               </div>

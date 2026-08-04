@@ -7,7 +7,7 @@ import { useLiveTicker } from "@/hooks/useLiveTicker";
 import { AgentCard } from "@/components/agents/AgentCard";
 import { PageHeader } from "@/components/layout/PageHeader";
 
-const WORKFLOW = ["Market Data", "Research AI", "Strategy AI", "News AI", "Risk AI", "CEO AI", "Execution AI", "MT5"];
+const WORKFLOW = ["ข้อมูลตลาด", "Research AI", "Strategy AI", "News AI", "Risk AI", "CEO AI", "Execution AI", "MT5"];
 
 export default function HeadquartersPage() {
   useLiveTicker();
@@ -16,18 +16,18 @@ export default function HeadquartersPage() {
   return (
     <div>
       <PageHeader
-        title="AI Headquarters"
-        subtitle="A fully autonomous AI trading company — 8 specialized agents, zero human confirmation required."
+        title="สำนักงานใหญ่ AI"
+        subtitle="บริษัทเทรด AI ที่ทำงานอัตโนมัติเต็มรูปแบบ — AI เฉพาะทาง 8 ตัว ไม่ต้องให้มนุษย์ยืนยัน"
         action={
           <span className="chip border-accent-green/30 bg-accent-green/10 text-accent-green">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-green" /> Autonomous · Live
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-green" /> อัตโนมัติ · สด
           </span>
         }
       />
 
       {/* Workflow pipeline */}
       <div className="glass mb-5 overflow-x-auto p-4">
-        <h3 className="panel-title mb-3">Decision Pipeline</h3>
+        <h3 className="panel-title mb-3">ขั้นตอนการตัดสินใจ</h3>
         <div className="flex min-w-max items-center gap-2">
           {WORKFLOW.map((step, i) => (
             <motion.div
@@ -46,7 +46,8 @@ export default function HeadquartersPage() {
           ))}
         </div>
         <p className="mt-3 text-[11px] text-muted">
-          Learning AI continuously evaluates every executed trade and updates each strategy&apos;s score, win-rate, profit factor and Sharpe ratio.
+          Learning AI ประเมินทุกไม้ที่เทรดอย่างต่อเนื่อง และอัปเดตคะแนน อัตราชนะ profit factor และ Sharpe ratio ของแต่ละกลยุทธ์
+
         </p>
       </div>
 

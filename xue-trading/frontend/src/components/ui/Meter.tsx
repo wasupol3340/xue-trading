@@ -40,9 +40,9 @@ export function RiskMeter({ value }: { value: number }) {
         />
       </div>
       <div className="flex justify-between text-[10px] font-medium uppercase tracking-wider">
-        <span className="text-accent-green">Low Risk</span>
-        <span className="text-muted">Medium</span>
-        <span className="text-accent-red">High</span>
+        <span className="text-accent-green">เสี่ยงต่ำ</span>
+        <span className="text-muted">กลาง</span>
+        <span className="text-accent-red">สูง</span>
       </div>
     </div>
   );

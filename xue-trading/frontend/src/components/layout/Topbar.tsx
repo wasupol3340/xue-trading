@@ -23,7 +23,7 @@ export function Topbar() {
       <div className="hidden items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2 md:flex">
         <Search className="h-4 w-4 text-muted" />
         <input
-          placeholder="Search symbols, agents, strategies…"
+          placeholder="ค้นหาสัญลักษณ์ AI กลยุทธ์…"
           className="w-64 bg-transparent text-sm text-white placeholder:text-muted-soft focus:outline-none"
         />
       </div>
@@ -34,7 +34,7 @@ export function Topbar() {
             isLive ? "border-accent-green/20 bg-accent-green/10 text-accent-green" : "border-white/10 bg-white/[0.03] text-muted"
           }`}
         >
-          {isLive ? "LIVE DATA" : "DEMO DATA"}
+          {isLive ? "ข้อมูลสด" : "ข้อมูลทดลอง"}
         </span>
 
         <div
@@ -49,12 +49,12 @@ export function Topbar() {
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-accent-green" />
               </span>
               <Wifi className="h-3.5 w-3.5 text-accent-green" />
-              <span className="text-xs font-medium text-accent-green">MT5 Connected</span>
+              <span className="text-xs font-medium text-accent-green">MT5 เชื่อมต่อแล้ว</span>
             </>
           ) : (
             <>
               <WifiOff className="h-3.5 w-3.5 text-accent-red" />
-              <span className="text-xs font-medium text-accent-red">MT5 Offline</span>
+              <span className="text-xs font-medium text-accent-red">MT5 ออฟไลน์</span>
             </>
           )}
         </div>
@@ -75,9 +75,9 @@ export function Topbar() {
           </div>
           <div className="hidden leading-tight sm:block">
             <p className="text-xs font-semibold text-white">XUE Master</p>
-            <p className="text-[10px] text-muted">CEO &amp; Founder</p>
+            <p className="text-[10px] text-muted">CEO &amp; ผู้ก่อตั้ง</p>
           </div>
-          <button onClick={onLogout} title="Sign out" className="ml-1 rounded-lg p-1.5 text-muted transition-colors hover:text-accent-red">
+          <button onClick={onLogout} title="ออกจากระบบ" className="ml-1 rounded-lg p-1.5 text-muted transition-colors hover:text-accent-red">
             <LogOut className="h-4 w-4" />
           </button>
         </div>
