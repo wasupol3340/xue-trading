@@ -1,12 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { POSITIONS, PORTFOLIO } from "@/lib/mock-data";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { fmtMoney, fmtNumber, timeAgo } from "@/lib/utils";
+import { useTradingStore } from "@/store/useTradingStore";
 
 export default function PortfolioPage() {
-  const p = PORTFOLIO;
+  // อ่านข้อมูลจริงจาก store ที่ useBackendSync เติมให้จากบัญชี MT5 จริงทุก 5 วินาที
+  // (แทนที่การใช้เลขตัวอย่างที่ค้างไว้ตั้งแต่ตอนสร้างเว็บ)
+  const p = useTradingStore((s) => s.portfolio);
+  const positions = useTradingStore((s) => s.positions);
   return (
     <div>
       <PageHeader title="พอร์ตโฟลิโอ" subtitle="อิควิตี้บัญชีแบบสด ไม้ที่เปิด และความเสี่ยงที่รับอยู่" />
@@ -30,7 +33,7 @@ export default function PortfolioPage() {
             </tr>
           </thead>
           <tbody>
-            {POSITIONS.map((pos, i) => (
+            {positions.map((pos, i) => (
               <motion.tr key={pos.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }} className="border-b border-white/[0.04] hover:bg-white/[0.02]">
                 <td className="px-4 py-3 font-semibold text-white">{pos.symbol}</td>
                 <td className="px-4 py-3">
