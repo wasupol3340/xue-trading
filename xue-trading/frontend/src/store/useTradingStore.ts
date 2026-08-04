@@ -1,8 +1,8 @@
 "use client";
 
 import { create } from "zustand";
-import { Agent, Meeting, Portfolio, Position, LogEntry, Strategy } from "@/types";
-import { AGENTS, MEETING, PORTFOLIO, POSITIONS, LOGS, STRATEGIES } from "@/lib/mock-data";
+import { Agent, Meeting, Portfolio, Position, LogEntry, Strategy, NewsItem } from "@/types";
+import { AGENTS, MEETING, PORTFOLIO, POSITIONS, LOGS, STRATEGIES, NEWS } from "@/lib/mock-data";
 
 interface TradingState {
   symbol: string;
@@ -21,6 +21,7 @@ interface TradingState {
   portfolio: Portfolio;
   positions: Position[];
   strategies: Strategy[];
+  news: NewsItem[];
   logs: LogEntry[];
   connection: { mt5: boolean; server: string; latency: number };
 
@@ -58,6 +59,7 @@ export const useTradingStore = create<TradingState>((set, get) => ({
   portfolio: PORTFOLIO,
   positions: POSITIONS,
   strategies: STRATEGIES,
+  news: NEWS,
   logs: LOGS,
   connection: { mt5: true, server: "MetaQuotes-Demo", latency: 41 },
 

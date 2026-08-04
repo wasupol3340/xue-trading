@@ -1,47 +1,58 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Layers, GitBranch, Droplets, Boxes, Waves, Target } from "lucide-react";
+import { Boxes, GitBranch, Waves, Layers } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { RadialProgress } from "@/components/ui/RadialProgress";
+import { useTradingStore } from "@/store/useTradingStore";
 
-const CONCEPTS = [
-  { icon: Boxes, name: "Order Blocks", desc: "โซนสะสมของสถาบันบนไทม์เฟรมใหญ่", conf: 89, color: "#3b82f6" },
-  { icon: GitBranch, name: "Fair Value Gap", desc: "ความไม่สมดุลของราคาที่มักถูกเติมเต็ม", conf: 82, color: "#8b5cf6" },
-  { icon: Droplets, name: "Liquidity Pools", desc: "จุด stop ที่ค้างอยู่เหนือ/ใต้จุดสูง-ต่ำที่เท่ากัน", conf: 85, color: "#22d3ee" },
-  { icon: Layers, name: "Market Structure", desc: "ตรวจจับทิศทาง BOS / CHoCH บน M15–H4", conf: 91, color: "#f0b429" },
-  { icon: Waves, name: "Wyckoff Phase", desc: "แผนภาพการสะสม / กระจายของ Wyckoff", conf: 80, color: "#2dd4bf" },
-  { icon: Target, name: "Premium / Discount", desc: "จุดเข้าเทรดที่ดีที่สุดในกรอบราคา", conf: 87, color: "#f6ad55" },
-];
+// ไอคอน/สีตามหมวดของเทคนิคจริง
+const CAT_ICON: Record<string, any> = { SMC: Boxes, ICT: GitBranch, Indicator: Waves, Volume: Layers };
+const CAT_COLOR: Record<string, string> = { SMC: "#3b82f6", ICT: "#8b5cf6", Indicator: "#f6ad55", Volume: "#2dd4bf" };
+const decLabel: Record<string, string> = { BUY: "ซื้อ", SELL: "ขาย", WAIT: "รอ", BUY_STRONG: "ซื้อ (มั่นใจ)" };
 
 export default function ResearchPage() {
+  // ข้อมูลจริงจาก store (useBackendSync เติมจากผลเทรดจริง + รอบตัดสินใจล่าสุด)
+  const strategies = useTradingStore((s) => s.strategies);
+  const meeting = useTradingStore((s) => s.meeting);
+  const symbol = useTradingStore((s) => s.symbol);
+  const techName = useTradingStore((s) => s.currentTechniqueName);
+
+  const ranked = [...strategies].sort((a, b) => b.score - a.score);
+  const top = ranked[0];
+
   return (
     <div>
-      <PageHeader title="ห้องวิจัย" subtitle="Research AI แยกตลาดออกเป็นแนวคิด SMC และ ICT พร้อมให้คะแนนแต่ละอย่างแบบเรียลไทม์" />
+      <PageHeader title="ห้องวิจัย" subtitle="Research AI จัดอันดับทุกเทคนิคจากผลเทรดจริงแบบเรียลไทม์" />
 
       <div className="mb-5 glass p-5">
-        <h3 className="panel-title mb-3">มุมมองตลาดปัจจุบัน · XAUUSD</h3>
+        <h3 className="panel-title mb-3">มุมมองตลาดปัจจุบัน · {symbol}</h3>
         <p className="text-sm leading-relaxed text-white/85">
-          โครงสร้างในไทม์เฟรมใหญ่เป็น <span className="font-semibold text-accent-green">ขาขึ้น</span> ราคากวาด sell-side liquidity เข้าสู่
-          demand <span className="font-semibold text-accent-blue">order block</span> ที่ 2,318 และทิ้ง{" "}
-          <span className="font-semibold text-accent-violet">fair value gap</span> ที่ยังไม่ถูกเติมไว้ที่ 2,331 ทิศทางเอนไปทางฝั่งซื้อ โดยเล็งไปที่ buy-side liquidity ที่ค้างอยู่
-          เหนือ 2,352 และจะผิดทางหากหลุดใต้ 2,314 การมาบรรจบกับช่วง London session และความผันผวนหลัง NFP ยิ่งเพิ่มความมั่นใจของโมเดล
+          ระบบกำลังให้น้ำหนักเทคนิค{" "}
+          <span className="font-semibold text-accent-blue">{techName || top?.name || "—"}</span> สูงสุดในตอนนี้
+          {top ? <> (คะแนน <span className="font-semibold text-accent-green">{top.score}</span>)</> : null}. มติล่าสุดของทีม AI:{" "}
+          <span className="font-semibold text-accent-violet">{decLabel[meeting.decision] ?? meeting.decision}</span> ·
+          ความมั่นใจ <span className="font-semibold">{meeting.confidence}%</span>. คะแนนทุกตัวด้านล่างคำนวณจาก
+          อัตราชนะและ Profit Factor ของการเทรดจริงที่สะสมไว้ (ไม่ใช่ค่าตายตัว) และปรับตัวขึ้นลงตามผลงานจริงของแต่ละเทคนิค.
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {CONCEPTS.map((c, i) => {
-          const Icon = c.icon;
+        {ranked.map((s, i) => {
+          const color = CAT_COLOR[s.category] || "#3b82f6";
+          const Icon = CAT_ICON[s.category] || Boxes;
           return (
-            <motion.div key={c.name} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="glass-strong flex items-center gap-4 p-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl" style={{ background: `${c.color}22`, color: c.color }}>
+            <motion.div key={s.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="glass-strong flex items-center gap-4 p-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl" style={{ background: `${color}22`, color }}>
                 <Icon className="h-6 w-6" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-bold text-white">{c.name}</p>
-                <p className="text-[11px] text-muted">{c.desc}</p>
+                <p className="text-sm font-bold text-white">{s.name}</p>
+                <p className="text-[11px] text-muted">
+                  {s.category} · ชนะ {s.winRate}% · {s.trades} ไม้
+                </p>
               </div>
-              <RadialProgress value={c.conf} label={`${c.conf}`} size={52} stroke={5} color={c.color} />
+              <RadialProgress value={s.score} label={`${s.score}`} size={52} stroke={5} color={color} />
             </motion.div>
           );
         })}

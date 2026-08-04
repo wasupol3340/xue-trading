@@ -1,7 +1,7 @@
 "use client";
 
-import { NEWS } from "@/lib/mock-data";
 import { NewsImpact } from "@/types";
+import { useTradingStore } from "@/store/useTradingStore";
 
 const impactColor: Record<NewsImpact, string> = {
   high: "#ef4444",
@@ -10,6 +10,7 @@ const impactColor: Record<NewsImpact, string> = {
 };
 
 export function EconomicNewsPanel() {
+  const news = useTradingStore((s) => s.news);
   return (
     <div className="glass flex flex-col p-4">
       <div className="mb-3 flex items-center justify-between">
@@ -17,7 +18,7 @@ export function EconomicNewsPanel() {
         <button className="text-[11px] font-semibold text-accent-cyan hover:underline">ดูทั้งหมด</button>
       </div>
       <div className="flex flex-col divide-y divide-white/[0.05]">
-        {NEWS.map((n) => (
+        {news.slice(0, 6).map((n) => (
           <div key={n.id} className="flex items-center gap-3 py-2.5">
             <span className="w-11 shrink-0 font-mono text-xs text-muted">{n.time}</span>
             <span className="text-base leading-none">{n.flag}</span>

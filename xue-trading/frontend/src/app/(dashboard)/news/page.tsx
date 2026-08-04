@@ -2,9 +2,9 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { NEWS } from "@/lib/mock-data";
 import { NewsImpact } from "@/types";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { useTradingStore } from "@/store/useTradingStore";
 
 const impactColor: Record<NewsImpact, string> = { high: "#ef4444", medium: "#f97316", low: "#22c55e" };
 const impactLabel: Record<NewsImpact, string> = { high: "สูง", medium: "กลาง", low: "ต่ำ" };
@@ -13,7 +13,9 @@ const SOURCES = ["ForexFactory", "Investing", "TradingEconomics", "Reuters"];
 
 export default function NewsPage() {
   const [filter, setFilter] = useState<NewsImpact | "all">("all");
-  const items = NEWS.filter((n) => filter === "all" || n.impact === filter);
+  // ปฏิทินข่าวจริงสัปดาห์นี้ (ForexFactory) จาก store ที่ useBackendSync เติมให้
+  const news = useTradingStore((s) => s.news);
+  const items = news.filter((n) => filter === "all" || n.impact === filter);
 
   return (
     <div>

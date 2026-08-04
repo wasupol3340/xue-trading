@@ -17,8 +17,8 @@ export default function PortfolioPage() {
       <div className="mb-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         <Stat label="ยอดเงิน" value={fmtMoney(p.balance)} />
         <Stat label="อิควิตี้" value={fmtMoney(p.equity)} tone="text-accent-cyan" />
-        <Stat label="กำไรรวม" value={`+${fmtMoney(p.totalProfit)}`} tone="text-up" />
-        <Stat label="วันนี้" value={`+${fmtMoney(p.todayProfit)}`} tone="text-up" />
+        <Stat label="กำไรรวม" value={`${p.totalProfit >= 0 ? "+" : ""}${fmtMoney(p.totalProfit)}`} tone={p.totalProfit >= 0 ? "text-up" : "text-down"} />
+        <Stat label="วันนี้" value={`${p.todayProfit >= 0 ? "+" : ""}${fmtMoney(p.todayProfit)}`} tone={p.todayProfit >= 0 ? "text-up" : "text-down"} />
         <Stat label="อัตราชนะ" value={`${p.winRate}%`} tone="text-accent-violet" />
         <Stat label="Drawdown" value={`${p.drawdown}%`} tone="text-down" />
       </div>

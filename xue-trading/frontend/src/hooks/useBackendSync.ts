@@ -3,7 +3,30 @@
 import { useEffect } from "react";
 import { api, isBackendConfigured, WS_URL, getToken } from "@/lib/api";
 import { useTradingStore } from "@/store/useTradingStore";
-import { Agent, Meeting, Portfolio, Position, Strategy, Vote } from "@/types";
+import { Agent, Meeting, Portfolio, Position, Strategy, Vote, NewsItem, NewsImpact } from "@/types";
+
+const FLAG: Record<string, string> = {
+  USD: "🇺🇸", EUR: "🇪🇺", GBP: "🇬🇧", JPY: "🇯🇵", AUD: "🇦🇺",
+  CAD: "🇨🇦", CHF: "🇨🇭", CNY: "🇨🇳", NZD: "🇳🇿", All: "🌐",
+};
+
+function mapNews(rows: any[]): NewsItem[] {
+  return rows.map((n, i) => {
+    const imp = String(n.impact || "").toLowerCase();
+    const impact: NewsImpact = imp === "high" ? "high" : imp === "medium" ? "medium" : "low";
+    return {
+      id: String(n.id ?? i),
+      time: n.time || "",
+      currency: n.currency || "",
+      flag: FLAG[n.currency] || "🌐",
+      title: n.title || "",
+      impact,
+      actual: n.actual ?? "—",
+      forecast: n.forecast ?? "—",
+      previous: n.previous ?? "—",
+    };
+  });
+}
 
 const ACCENT: Record<string, string> = {
   CEO: "#f0b429", Research: "#3b82f6", News: "#22c55e", Risk: "#8b5cf6",
@@ -91,13 +114,14 @@ export function useBackendSync() {
 
     const poll = async () => {
       try {
-        const [status, account, positions, agents, strategies, decision] = await Promise.all([
+        const [status, account, positions, agents, strategies, decision, news] = await Promise.all([
           api.status().catch(() => null),
           api.account().catch(() => null),
           api.positions().catch(() => []),
           api.agents().catch(() => []),
           api.strategies().catch(() => []),
           api.decision().catch(() => null),
+          api.news().catch(() => []),
         ]);
         if (!alive) return;
 
@@ -106,6 +130,7 @@ export function useBackendSync() {
         if (positions?.length !== undefined) patch.positions = mapPositions(positions);
         if (agents?.length) patch.agents = mapAgents(agents);
         if (strategies?.length) patch.strategies = mapStrategies(strategies);
+        if (news?.length) patch.news = mapNews(news);
         if (decision) {
           patch.meeting = mapMeeting(decision);
           patch.currentTechnique = decision.technique;

@@ -2,8 +2,8 @@
 
 import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
-import { MEETING } from "@/lib/mock-data";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { useTradingStore } from "@/store/useTradingStore";
 
 const agentColor: Record<string, string> = {
   CEO: "#f0b429",
@@ -19,25 +19,23 @@ const agentColor: Record<string, string> = {
 const voteLabel: Record<string, string> = { BUY: "ซื้อ", SELL: "ขาย", WAIT: "รอ", BUY_STRONG: "ซื้อ (มั่นใจ)" };
 const vLabel = (v: string) => voteLabel[v] ?? v;
 
-const votes = [
-  { agent: "CEO", vote: "BUY" },
-  { agent: "Research", vote: "BUY" },
-  { agent: "News", vote: "WAIT" },
-  { agent: "Risk", vote: "BUY" },
-  { agent: "Strategy", vote: "BUY" },
-  { agent: "Execution", vote: "BUY" },
-  { agent: "Learning", vote: "BUY" },
-  { agent: "Monitor", vote: "BUY" },
-];
-
 export default function MeetingPage() {
+  // การประชุม/โหวตจริงจากรอบตัดสินใจล่าสุดของ AI (store เติมโดย useBackendSync)
+  const meeting = useTradingStore((s) => s.meeting);
+  const votes = meeting.messages
+    .filter((m) => m.vote)
+    .map((m) => ({ agent: m.agent as string, vote: m.vote as string }));
+  const decColor =
+    meeting.decision === "SELL" ? "text-accent-red"
+    : meeting.decision === "WAIT" ? "text-brand"
+    : "text-accent-green";
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
       <div>
         <PageHeader title="ห้องประชุม AI" subtitle="ทีม AI ประชุมกันทุก 15 นาที เพื่อถกเถียง โหวต และตัดสินใจโดยอัตโนมัติ" />
         <div className="glass p-5">
           <div className="relative space-y-4 before:absolute before:left-[19px] before:top-2 before:h-[calc(100%-1rem)] before:w-px before:bg-white/10">
-            {MEETING.messages.map((m, i) => (
+            {meeting.messages.map((m, i) => (
               <motion.div
                 key={m.id}
                 initial={{ opacity: 0, x: -10 }}
@@ -69,7 +67,7 @@ export default function MeetingPage() {
         <div className="glass p-4">
           <div className="mb-3 flex items-center justify-between">
             <span className="panel-title">ผลโหวตสด</span>
-            <span className="font-mono text-sm font-bold text-accent-green">8 / 8</span>
+            <span className="font-mono text-sm font-bold text-accent-green">{votes.length} / {meeting.total || votes.length}</span>
           </div>
           <div className="space-y-2">
             {votes.map((v, i) => (
@@ -83,8 +81,8 @@ export default function MeetingPage() {
         <div className="glass border-accent-green/20 bg-accent-green/5 p-5 text-center">
           <CheckCircle2 className="mx-auto mb-2 h-8 w-8 text-accent-green" />
           <p className="text-xs uppercase tracking-wider text-muted">การตัดสินใจสุดท้าย</p>
-          <p className="text-3xl font-black text-accent-green">ซื้อ</p>
-          <p className="mt-1 text-xs text-muted">ความมั่นใจของมติ {MEETING.confidence}%</p>
+          <p className={`text-3xl font-black ${decColor}`}>{vLabel(meeting.decision)}</p>
+          <p className="mt-1 text-xs text-muted">ความมั่นใจของมติ {meeting.confidence}%</p>
         </div>
       </div>
     </div>
