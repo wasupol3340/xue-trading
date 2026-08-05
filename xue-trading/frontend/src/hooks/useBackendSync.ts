@@ -135,6 +135,7 @@ export function useBackendSync() {
           patch.meeting = mapMeeting(decision);
           patch.currentTechnique = decision.technique;
           patch.currentTechniqueName = decision.technique_name;
+          patch.scorecard = decision.scorecard || {};
         }
         if (status) {
           patch.engineRunning = status.running;

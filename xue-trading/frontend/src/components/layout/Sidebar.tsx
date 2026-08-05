@@ -16,6 +16,7 @@ import {
   Settings,
   ScrollText,
   Building2,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +26,7 @@ const NAV = [
   { href: "/agents", label: "ทีม AI", icon: Bot },
   { href: "/research", label: "ห้องวิจัย", icon: FlaskConical },
   { href: "/meeting", label: "ห้องประชุม", icon: Users },
+  { href: "/committee", label: "คณะกรรมการ", icon: ShieldCheck },
   { href: "/portfolio", label: "พอร์ตโฟลิโอ", icon: Wallet },
   { href: "/strategy", label: "ศูนย์กลยุทธ์", icon: Brain },
   { href: "/backtest", label: "ทดสอบย้อนหลัง", icon: LineChart },
