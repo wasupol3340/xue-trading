@@ -41,7 +41,7 @@ export default function CommitteePage() {
     <div>
       <PageHeader
         title="คณะกรรมการลงทุน"
-        subtitle="การตัดสินใจจริงล่าสุดของบอท (รอบประชุมจริงทุก 15 นาที) — สิ่งที่เห็นคือสิ่งที่บอททำจริง"
+        subtitle="การตัดสินใจจริงล่าสุดของบอท (อัปเดตทุกรอบประชุม) — สิ่งที่เห็นคือสิ่งที่บอททำจริง"
       />
 
       {/* ผลรอบล่าสุดจริงของบอท + เหตุผลว่าออก/ไม่ออกออเดอร์ */}
@@ -62,14 +62,18 @@ export default function CommitteePage() {
           </div>
         </div>
         <span className="font-mono text-[11px] text-muted">
-          ประเมินเมื่อ {lastActionAt || "—"} · อัปเดตทุกรอบ 15 นาที
+          ประเมินเมื่อ {lastActionAt || "—"} · อัปเดตทุกรอบประชุม
         </span>
       </div>
 
       {!has ? (
         <div className="glass flex flex-col items-center gap-3 p-12 text-center">
           <ShieldCheck className="h-10 w-10 text-muted" />
-          <p className="text-sm text-muted">ยังไม่มีการประเมิน — รอบอทประชุมรอบแรก (สูงสุด 15 นาที) แล้วคณะกรรมการจะลงความเห็นที่นี่</p>
+          <p className="text-sm text-muted">
+            {lastAction
+              ? "รอบล่าสุดยังไม่มีเทคนิคเข้าเงื่อนไข — คณะกรรมการจะลงคะแนนเต็ม 13 หมวดเมื่อมีสัญญาณให้ตรวจ (ดูสถานะรอบล่าสุดด้านบน)"
+              : "รอบอทประชุมรอบแรก แล้วคณะกรรมการจะลงความเห็นที่นี่"}
+          </p>
         </div>
       ) : (
         <>

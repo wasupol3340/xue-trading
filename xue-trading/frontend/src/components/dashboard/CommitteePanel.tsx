@@ -67,8 +67,8 @@ export function CommitteePanel() {
 
       {/* last action (why this round) */}
       <div className="mb-3 rounded-lg border border-white/[0.05] bg-white/[0.02] px-3 py-2">
-        <p className="text-[12px] text-white/90">{lastAction || "รอบอทประเมินรอบแรก (สูงสุด 15 นาที)"}</p>
-        {lastActionAt && <p className="mt-0.5 font-mono text-[10px] text-muted">ประเมินเมื่อ {lastActionAt} · ทุก 15 นาที</p>}
+        <p className="text-[12px] text-white/90">{lastAction || "รอบอทประเมินรอบแรก..."}</p>
+        {lastActionAt && <p className="mt-0.5 font-mono text-[10px] text-muted">ประเมินเมื่อ {lastActionAt} · ทุกรอบประชุม</p>}
       </div>
 
       {/* 13 category mini-bars */}
