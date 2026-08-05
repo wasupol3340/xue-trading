@@ -13,6 +13,7 @@ import {
   Building2,
   ShieldCheck,
   TrendingUp,
+  Landmark,
 } from "lucide-react";
 
 // รายการเมนูกลาง — ใช้ทั้ง Sidebar (จอใหญ่) และ MobileNav (มือถือ)
@@ -22,6 +23,7 @@ export const NAV = [
   { href: "/agents", label: "ทีม AI", icon: Bot },
   { href: "/research", label: "ห้องวิจัย", icon: FlaskConical },
   { href: "/meeting", label: "ห้องประชุม", icon: Users },
+  { href: "/boardroom", label: "ประชุมใหญ่ 4 ทุ่ม", icon: Landmark },
   { href: "/committee", label: "คณะกรรมการ", icon: ShieldCheck },
   { href: "/portfolio", label: "พอร์ตโฟลิโอ", icon: Wallet },
   { href: "/performance", label: "ผลงาน", icon: TrendingUp },
