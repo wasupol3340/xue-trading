@@ -29,21 +29,46 @@ const verdictStyle = (r: string) =>
 
 export default function CommitteePage() {
   const sc = useTradingStore((s) => s.scorecard) || {};
+  const lastAction = useTradingStore((s) => s.lastAction);
+  const lastActionAt = useTradingStore((s) => s.lastActionAt);
   const has = !!sc.recommendation;
   const v = verdictStyle(sc.recommendation || "NO TRADE");
   const scores = sc.scores || {};
+  const executed = (lastAction || "").includes("ส่งออเดอร์แล้ว");
 
   return (
     <div>
       <PageHeader
         title="คณะกรรมการลงทุน"
-        subtitle="ตรวจสัญญาณ 12 ขั้น ให้คะแนน 13 หมวด → BUY / SELL / NO TRADE (รักษาเงินทุนเป็นหลัก)"
+        subtitle="การตัดสินใจจริงล่าสุดของบอท (รอบประชุมจริงทุก 15 นาที) — สิ่งที่เห็นคือสิ่งที่บอททำจริง"
       />
+
+      {/* ผลรอบล่าสุดจริงของบอท + เหตุผลว่าออก/ไม่ออกออเดอร์ */}
+      <div
+        className="mb-5 glass flex flex-wrap items-center justify-between gap-3 p-4"
+        style={{ borderColor: executed ? "#22c55e33" : "#8b90a033" }}
+      >
+        <div className="flex items-center gap-3">
+          <span
+            className="flex h-9 w-9 items-center justify-center rounded-lg"
+            style={{ background: executed ? "#22c55e22" : "#8b90a022", color: executed ? "#22c55e" : "#8b90a0" }}
+          >
+            {executed ? "✅" : "•"}
+          </span>
+          <div>
+            <p className="text-[11px] uppercase tracking-wider text-muted">ผลรอบล่าสุดของบอท</p>
+            <p className="text-sm font-semibold text-white">{lastAction || "ยังไม่ได้ประเมินรอบแรก (รอสูงสุด 15 นาที)"}</p>
+          </div>
+        </div>
+        <span className="font-mono text-[11px] text-muted">
+          ประเมินเมื่อ {lastActionAt || "—"} · อัปเดตทุกรอบ 15 นาที
+        </span>
+      </div>
 
       {!has ? (
         <div className="glass flex flex-col items-center gap-3 p-12 text-center">
           <ShieldCheck className="h-10 w-10 text-muted" />
-          <p className="text-sm text-muted">ยังไม่มีการประเมิน — รอเทคนิคเสนอสัญญาณ แล้วคณะกรรมการจะลงความเห็นที่นี่</p>
+          <p className="text-sm text-muted">ยังไม่มีการประเมิน — รอบอทประชุมรอบแรก (สูงสุด 15 นาที) แล้วคณะกรรมการจะลงความเห็นที่นี่</p>
         </div>
       ) : (
         <>

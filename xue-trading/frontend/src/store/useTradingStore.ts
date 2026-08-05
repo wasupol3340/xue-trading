@@ -23,6 +23,8 @@ interface TradingState {
   strategies: Strategy[];
   news: NewsItem[];
   scorecard: any;
+  lastAction: string;
+  lastActionAt: string;
   logs: LogEntry[];
   connection: { mt5: boolean; server: string; latency: number };
 
@@ -62,6 +64,8 @@ export const useTradingStore = create<TradingState>((set, get) => ({
   strategies: STRATEGIES,
   news: NEWS,
   scorecard: {},
+  lastAction: "",
+  lastActionAt: "",
   logs: LOGS,
   connection: { mt5: true, server: "MetaQuotes-Demo", latency: 41 },
 

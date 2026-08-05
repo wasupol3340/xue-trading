@@ -135,11 +135,14 @@ export function useBackendSync() {
           patch.meeting = mapMeeting(decision);
           patch.currentTechnique = decision.technique;
           patch.currentTechniqueName = decision.technique_name;
-          patch.scorecard = decision.scorecard || {};
         }
         if (status) {
           patch.engineRunning = status.running;
           if (status.current_technique_name) patch.currentTechniqueName = status.current_technique_name;
+          // คณะกรรมการ: โชว์ "การตัดสินใจจริงล่าสุดของบอท" (รอบ 15 นาทีจริง) + เหตุผลรอบล่าสุด
+          patch.scorecard = status.scorecard || {};
+          patch.lastAction = status.last_action || "";
+          patch.lastActionAt = status.last_action_at || "";
           if (status.mt5)
             patch.connection = {
               mt5: status.mt5.connected,
