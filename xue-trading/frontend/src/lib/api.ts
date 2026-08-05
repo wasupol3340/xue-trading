@@ -74,6 +74,7 @@ export const api = {
   agents: () => request<any[]>("/agents"),
   brains: () => request<any[]>("/agents/brains"),
   reviews: () => request<any[]>("/agents/reviews"),
+  agentsLive: () => request<any[]>("/agents/live"),
   decision: () => request<any>("/agents/decision"),
   strategies: () => request<any[]>("/strategies"),
   news: () => request<any[]>("/news"),
