@@ -8,7 +8,7 @@ import { SignalCards } from "@/components/dashboard/SignalCards";
 import { TradeControls } from "@/components/dashboard/TradeControls";
 import { MeetingTimeline } from "@/components/dashboard/MeetingTimeline";
 import { LiveTechniqueBar } from "@/components/dashboard/LiveTechniqueBar";
-import { TechniquePanel } from "@/components/dashboard/TechniquePanel";
+import { CommitteePanel } from "@/components/dashboard/CommitteePanel";
 
 export default function DashboardPage() {
   useLiveTicker();
@@ -23,7 +23,7 @@ export default function DashboardPage() {
       {/* CENTER — Technique learning + signals + controls */}
       <div className="order-1 flex min-w-0 flex-col gap-4 xl:order-2">
         <LiveTechniqueBar />
-        <TechniquePanel />
+        <CommitteePanel />
         <SignalCards />
         <TradeControls />
         <MeetingTimeline />
