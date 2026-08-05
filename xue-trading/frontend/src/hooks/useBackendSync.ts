@@ -143,6 +143,7 @@ export function useBackendSync() {
           patch.scorecard = status.scorecard || {};
           patch.lastAction = status.last_action || "";
           patch.lastActionAt = status.last_action_at || "";
+          patch.advisorText = status.advisor_text || "";
           if (status.mt5)
             patch.connection = {
               mt5: status.mt5.connected,

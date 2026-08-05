@@ -25,6 +25,7 @@ interface TradingState {
   scorecard: any;
   lastAction: string;
   lastActionAt: string;
+  advisorText: string;
   logs: LogEntry[];
   connection: { mt5: boolean; server: string; latency: number };
 
@@ -66,6 +67,7 @@ export const useTradingStore = create<TradingState>((set, get) => ({
   scorecard: {},
   lastAction: "",
   lastActionAt: "",
+  advisorText: "",
   logs: LOGS,
   connection: { mt5: true, server: "MetaQuotes-Demo", latency: 41 },
 

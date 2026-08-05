@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ShieldCheck, CheckCircle2, AlertTriangle } from "lucide-react";
+import { ShieldCheck, CheckCircle2, AlertTriangle, Sparkles } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useTradingStore } from "@/store/useTradingStore";
 
@@ -31,6 +31,7 @@ export default function CommitteePage() {
   const sc = useTradingStore((s) => s.scorecard) || {};
   const lastAction = useTradingStore((s) => s.lastAction);
   const lastActionAt = useTradingStore((s) => s.lastActionAt);
+  const advisorText = useTradingStore((s) => s.advisorText);
   const has = !!sc.recommendation;
   const v = verdictStyle(sc.recommendation || "NO TRADE");
   const scores = sc.scores || {};
@@ -99,6 +100,16 @@ export default function CommitteePage() {
               </div>
             </div>
           </div>
+
+          {/* AI advisor — LLM second opinion (advisory only) */}
+          {advisorText && (
+            <div className="mb-5 glass p-5" style={{ borderColor: "#8b5cf633" }}>
+              <p className="panel-title mb-2 flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-accent-violet" /> ที่ปรึกษา AI (ความเห็นเสริม — ไม่ตัดสินใจเทรดเอง)
+              </p>
+              <p className="text-sm leading-relaxed text-white/90">{advisorText}</p>
+            </div>
+          )}
 
           {/* 13 category scores */}
           <div className="mb-5 glass p-5">
