@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Bell, Search, Wifi, WifiOff, Server, LogOut } from "lucide-react";
 import { useTradingStore } from "@/store/useTradingStore";
 import { useAuthStore } from "@/store/useAuthStore";
+import { MobileNav } from "@/components/layout/MobileNav";
 
 export function Topbar() {
   const router = useRouter();
@@ -20,6 +21,7 @@ export function Topbar() {
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-white/[0.06] bg-bg/70 px-5 backdrop-blur-xl">
+      <MobileNav />
       <div className="hidden items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2 md:flex">
         <Search className="h-4 w-4 text-muted" />
         <input

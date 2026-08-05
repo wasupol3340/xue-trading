@@ -1,0 +1,34 @@
+import {
+  LayoutDashboard,
+  Wallet,
+  Bot,
+  FlaskConical,
+  Users,
+  Brain,
+  History,
+  Newspaper,
+  LineChart,
+  Settings,
+  ScrollText,
+  Building2,
+  ShieldCheck,
+  TrendingUp,
+} from "lucide-react";
+
+// รายการเมนูกลาง — ใช้ทั้ง Sidebar (จอใหญ่) และ MobileNav (มือถือ)
+export const NAV = [
+  { href: "/dashboard", label: "แดชบอร์ด", icon: LayoutDashboard },
+  { href: "/headquarters", label: "สำนักงานใหญ่ AI", icon: Building2 },
+  { href: "/agents", label: "ทีม AI", icon: Bot },
+  { href: "/research", label: "ห้องวิจัย", icon: FlaskConical },
+  { href: "/meeting", label: "ห้องประชุม", icon: Users },
+  { href: "/committee", label: "คณะกรรมการ", icon: ShieldCheck },
+  { href: "/portfolio", label: "พอร์ตโฟลิโอ", icon: Wallet },
+  { href: "/performance", label: "ผลงาน", icon: TrendingUp },
+  { href: "/strategy", label: "ศูนย์กลยุทธ์", icon: Brain },
+  { href: "/backtest", label: "ทดสอบย้อนหลัง", icon: LineChart },
+  { href: "/news", label: "ข่าวเศรษฐกิจ", icon: Newspaper },
+  { href: "/history", label: "ประวัติการเทรด", icon: History },
+  { href: "/logs", label: "บันทึกระบบ", icon: ScrollText },
+  { href: "/settings", label: "ตั้งค่า", icon: Settings },
+];
