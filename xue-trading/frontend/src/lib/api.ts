@@ -73,6 +73,7 @@ export const api = {
   history: () => request<any>("/trading/history"),
   agents: () => request<any[]>("/agents"),
   brainOs: () => request<any>("/agents/brain-os"),
+  ceoBrain: () => request<any>("/agents/ceo-brain"),
   brains: () => request<any[]>("/agents/brains"),
   reviews: () => request<any[]>("/agents/reviews"),
   agentsLive: () => request<any[]>("/agents/live"),
