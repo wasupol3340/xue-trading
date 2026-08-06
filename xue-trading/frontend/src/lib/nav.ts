@@ -17,11 +17,13 @@ import {
   GraduationCap,
   NotebookPen,
   ClipboardList,
+  BrainCircuit,
 } from "lucide-react";
 
 // รายการเมนูกลาง — ใช้ทั้ง Sidebar (จอใหญ่) และ MobileNav (มือถือ)
 export const NAV = [
   { href: "/dashboard", label: "แดชบอร์ด", icon: LayoutDashboard },
+  { href: "/brain-os", label: "Brain OS", icon: BrainCircuit },
   { href: "/headquarters", label: "สำนักงานใหญ่ AI", icon: Building2 },
   { href: "/agents", label: "ทีม AI", icon: Bot },
   { href: "/research", label: "ห้องวิจัย", icon: FlaskConical },
