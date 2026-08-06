@@ -19,6 +19,7 @@ import {
   ClipboardList,
   BrainCircuit,
   Crown,
+  ShieldAlert,
   type LucideIcon,
 } from "lucide-react";
 
@@ -72,6 +73,7 @@ export const NAV_GROUPS: NavGroup[] = [
     label: "ระบบ",
     icon: Settings,
     items: [
+      { href: "/guardian", label: "ทีมเทคนิค (ความปลอดภัย)", icon: ShieldAlert },
       { href: "/news", label: "ข่าวเศรษฐกิจ", icon: Newspaper },
       { href: "/logs", label: "บันทึกระบบ", icon: ScrollText },
       { href: "/settings", label: "ตั้งค่า", icon: Settings },
