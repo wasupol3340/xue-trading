@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ClipboardList, Lightbulb, CheckCircle2, XCircle, TrendingUp, BookMarked, RefreshCw, AlertTriangle, CalendarDays } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { BrainModeBanner } from "@/components/brain/BrainModeBanner";
 import { api } from "@/lib/api";
 
 type Report = {
@@ -11,7 +12,9 @@ type Report = {
   learned?: string; confirmed_txt?: string; rejected_txt?: string;
   agents_txt?: string; standards_txt?: string; net_pnl?: number; trades?: number;
 };
-type Std = { id: number; rule: string; evidence_wr: number; evidence_n: number; status: string; created_at: string };
+type Std = { id: number; rule: string; evidence_wr: number; evidence_n: number; status: string; created_at: string; confidence?: number };
+
+const confColor = (c: number) => (c >= 70 ? "#22c55e" : c >= 40 ? "#f0b429" : "#8b90a0");
 
 const Q = [
   { key: "learned", n: 1, label: "เราเรียนรู้อะไรใหม่?", icon: Lightbulb, c: "#38bdf8" },
@@ -56,6 +59,8 @@ export default function ReportPage() {
           </button>
         }
       />
+
+      <BrainModeBanner />
 
       {err && (
         <div className="glass mb-5 flex items-center gap-2 p-4 text-sm" style={{ borderColor: "#ef444433" }}>
@@ -128,6 +133,15 @@ export default function ReportPage() {
                     </span>
                     <span className="min-w-[160px] flex-1 text-[13px] text-white/90">{s.rule}</span>
                     <span className="shrink-0 font-mono text-[11px] text-muted">{s.evidence_wr}% · {s.evidence_n} ไม้</span>
+                    {s.confidence != null && (
+                      <span
+                        className="shrink-0 rounded-md px-2 py-0.5 font-mono text-[10px] font-bold"
+                        style={{ color: confColor(s.confidence), background: `${confColor(s.confidence)}18` }}
+                        title="ความมั่นใจว่าเป็นของจริง ไม่ใช่ฟลุค"
+                      >
+                        มั่นใจ {s.confidence}%
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>

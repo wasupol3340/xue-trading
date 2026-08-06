@@ -4,13 +4,34 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { NotebookPen, CheckCircle2, Clock, Sparkles, XCircle, ShieldCheck, RefreshCw, AlertTriangle } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { BrainModeBanner } from "@/components/brain/BrainModeBanner";
 import { api } from "@/lib/api";
 
 type Entry = {
   id: number; source: string; subject: string; statement: string; kind: string;
   status: string; baseline_wr: number; baseline_n: number; cur_wr: number; cur_n: number;
+  confidence?: number;
 };
 type Trust = Record<string, { confirmed: number; rejected: number; open: number; trust: number | null }>;
+
+// สีความมั่นใจ: ยิ่งข้อมูลเยอะ+ห่างจากเหรียญ 50% ยิ่งมั่นใจ
+const confColor = (c: number) => (c >= 70 ? "#22c55e" : c >= 40 ? "#f0b429" : "#8b90a0");
+const confLabel = (c: number) => (c >= 70 ? "มั่นใจสูง" : c >= 40 ? "มั่นใจปานกลาง" : "ยังไม่ชัวร์");
+
+function ConfidenceMeter({ value }: { value: number }) {
+  const c = confColor(value);
+  return (
+    <div className="shrink-0" style={{ minWidth: 108 }} title={`ความมั่นใจว่าเป็นของจริง ไม่ใช่ฟลุค — ${value}% (${confLabel(value)})`}>
+      <div className="mb-1 flex items-center justify-between">
+        <span className="text-[10px] text-muted">ความมั่นใจ</span>
+        <span className="font-mono text-[11px] font-bold" style={{ color: c }}>{value}%</span>
+      </div>
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.07]">
+        <div className="h-full rounded-full" style={{ width: `${Math.max(3, value)}%`, background: c }} />
+      </div>
+    </div>
+  );
+}
 
 const STATUS: Record<string, { label: string; c: string; icon: any }> = {
   confirmed: { label: "ยืนยันแล้ว", c: "#22c55e", icon: CheckCircle2 },
@@ -54,6 +75,8 @@ export default function JournalPage() {
         }
       />
 
+      <BrainModeBanner />
+
       {err && (
         <div className="glass mb-5 flex items-center gap-2 p-4 text-sm" style={{ borderColor: "#ef444433" }}>
           <AlertTriangle className="h-4 w-4 text-accent-red" />
@@ -93,6 +116,15 @@ export default function JournalPage() {
         </div>
       )}
 
+      {/* Confidence Engine explainer */}
+      {entries.length > 0 && (
+        <div className="glass mb-5 flex flex-wrap items-center gap-x-4 gap-y-1 p-3 text-[11px] text-muted">
+          <span className="font-bold text-white/80">แถบ “ความมั่นใจ” = โอกาสที่บทเรียนนี้เป็นของจริง ไม่ใช่ฟลุค</span>
+          <span>คิดจาก “ข้อมูลมากพอไหม” × “ห่างจากเหรียญ 50% แค่ไหน” — ยิ่งไม้เยอะ ยิ่งมั่นใจ</span>
+          <span className="font-mono">1 ไม้/100% ≈ 5% · 5 ไม้/78% ≈ 22% · 700 ไม้/74% ≈ 97%</span>
+        </div>
+      )}
+
       {/* hypotheses grouped by status */}
       <div className="space-y-6">
         {grouped.map((g) => {
@@ -125,6 +157,7 @@ export default function JournalPage() {
                     <span className="shrink-0 font-mono text-xs text-muted">
                       หลักฐาน: {e.cur_wr}% · {e.cur_n} ไม้
                     </span>
+                    <ConfidenceMeter value={e.confidence ?? 0} />
                   </motion.div>
                 ))}
               </div>
