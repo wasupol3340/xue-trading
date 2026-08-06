@@ -14,6 +14,7 @@ from __future__ import annotations
 import logging
 import time
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 from typing import Optional
 
 from app.core.config import settings
@@ -205,6 +206,71 @@ class MT5Client:
                 return round(sum(d.profit + d.swap + d.commission for d in deals), 2)
             return None
         return None  # simulated broker → caller falls back to last floating pnl
+
+    def realized_today(self) -> Optional[float]:
+        """TRUE realized P/L for today, read straight from MT5 history (our magic).
+        Restart-proof — unlike an in-memory counter that resets on every reboot.
+        Returns None if unavailable so the caller can fall back."""
+        if _HAS_MT5 and self.connected:  # pragma: no cover
+            try:
+                now = datetime.now()
+                start = datetime(now.year, now.month, now.day)
+                deals = mt5.history_deals_get(start, now)  # type: ignore
+                if deals is None:
+                    return None
+                total = 0.0
+                for d in deals:
+                    # นับเฉพาะ 'ดีลเทรดจริง' (BUY/SELL) — ตัดรายการฝาก/ถอน/เครดิต/โบนัส/
+                    # ปรับยอด (DEAL_TYPE_BALANCE ฯลฯ) ที่ทำให้ 'กำไรวันนี้' เพี้ยน
+                    # (เช่นเติมทุน $5,755 เคยถูกนับเป็นกำไรจนขึ้น 2,238)
+                    if getattr(d, "type", None) not in (mt5.DEAL_TYPE_BUY, mt5.DEAL_TYPE_SELL):  # type: ignore
+                        continue
+                    if getattr(d, "magic", 0) and d.magic != self.magic:
+                        continue
+                    total += d.profit + d.swap + d.commission
+                return round(total, 2)
+            except Exception:  # noqa: BLE001
+                return None
+        return None
+
+    def closed_trades(self, limit: int = 60, days: int = 30) -> list[dict]:
+        """Recent CLOSED positions reconstructed from MT5 history deals (our magic).
+        Each row has real entry/exit price, side, lots, net pnl, the order comment
+        (which carries the technique, e.g. 'XUE-orderblock') and close time.
+        Returns [] on the simulated broker or any error (fail-open)."""
+        if _HAS_MT5 and self.connected:  # pragma: no cover
+            try:
+                now = datetime.now()
+                start = now - timedelta(days=days)
+                deals = mt5.history_deals_get(start, now)  # type: ignore
+                if not deals:
+                    return []
+                by_pos: dict = {}
+                for d in deals:
+                    if getattr(d, "magic", 0) and d.magic != self.magic:
+                        continue
+                    by_pos.setdefault(getattr(d, "position_id", 0), []).append(d)
+                out: list[dict] = []
+                for _pid, ds in by_pos.items():
+                    ds.sort(key=lambda x: x.time)
+                    ins = [x for x in ds if x.entry == mt5.DEAL_ENTRY_IN]   # type: ignore
+                    outs = [x for x in ds if x.entry != mt5.DEAL_ENTRY_IN]  # type: ignore
+                    if not ins or not outs:
+                        continue  # not a completed round-trip yet
+                    entry_deal, exit_deal = ins[0], outs[-1]
+                    pnl = round(sum(x.profit + x.swap + x.commission for x in ds), 2)
+                    side = "BUY" if entry_deal.type == mt5.DEAL_TYPE_BUY else "SELL"  # type: ignore
+                    comment = getattr(entry_deal, "comment", "") or getattr(exit_deal, "comment", "") or ""
+                    out.append({
+                        "symbol": entry_deal.symbol, "side": side, "lots": float(exit_deal.volume),
+                        "entry": float(entry_deal.price), "exit": float(exit_deal.price),
+                        "pnl": pnl, "comment": comment, "closed_at": int(exit_deal.time),
+                    })
+                out.sort(key=lambda r: r["closed_at"], reverse=True)
+                return out[:limit]
+            except Exception:  # noqa: BLE001
+                return []
+        return []
 
     # ---- lot sizing ------------------------------------------------------- #
     def calc_lot(self, symbol: str, entry: float, sl: float, risk_pct: float, balance: float) -> float:

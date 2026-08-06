@@ -85,3 +85,5 @@ class DecisionOut(BaseModel):
     rationale: str
     technique: str = ""
     technique_name: str = ""
+    context: dict = {}  # market situation at decision time (for the learning brain)
+    scorecard: dict = {}  # Investment Committee 13-category review (BUY/SELL/NO TRADE)

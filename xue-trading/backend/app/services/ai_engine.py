@@ -18,7 +18,10 @@ from typing import List
 from app.schemas.trading import AgentOut, DecisionOut
 from app.services.market_data import get_candles
 from app.services.learning import learning
-from app.services.techniques import analyze
+from app.services.techniques import analyze, market_context
+from app.core.config import settings
+from app.services.mt5_client import client
+from app.services import committee
 
 AGENT_DEFS = [
     ("ceo", "CEO AI", "CEO", "Strategic Decision Maker"),
@@ -81,26 +84,42 @@ def snapshot_agents() -> List[AgentOut]:
 
 
 def run_meeting(symbol: str = "XAUUSD") -> DecisionOut:
-    candles = get_candles(symbol, "M15", 120)
+    # 260 M15 candles so EMA200 and swing/structure lookbacks are well-formed.
+    candles = get_candles(symbol, "M15", 260)
 
-    # Check EVERY enabled technique on the real candles; trade the highest-scored
-    # technique that currently has a valid setup. This trades far more often and
-    # accumulates real results faster, while staying signal-driven.
-    candidates = []  # (key, signal, score)
+    # Read the current market context FIRST (trend / session / volatility) so the
+    # brain can rank techniques by how well each performs in THIS context — not by
+    # a single global score. contextual_score() safely degrades to the overall
+    # score until a context has enough real trades (overfit guard).
+    ctx = market_context(candles)
+
+    # Check EVERY enabled technique on the real candles; trade the technique that
+    # currently has a valid setup AND the best learned score for this context.
+    # This trades far more often and accumulates real results faster, while
+    # staying signal-driven and context-aware.
+    candidates = []  # (key, signal, contextual_score)
     for key, strat in learning.strategies.items():
         if not strat.enabled:
             continue
         s = analyze(key, candles)
         if s.get("side"):
-            candidates.append((key, s, strat.score))
+            # มติที่ประชุมทบทวนเทคนิค: เทคนิคที่กำลังแพ้ถูกงดเฉพาะสภาพตลาดที่พิสูจน์
+            # แล้วว่าแพ้ (ปรับให้ดีขึ้น) — ยังเทรดในสภาพที่เก่ง/สภาพใหม่ได้. lot ไม่เปลี่ยน.
+            if not learning.technique_allowed(key, ctx):
+                continue
+            candidates.append((key, s, learning.contextual_score(key, ctx)))
 
     if candidates:
-        candidates.sort(key=lambda c: c[2], reverse=True)  # highest score first
+        candidates.sort(key=lambda c: c[2], reverse=True)  # best context score first
         technique_key, sig, _ = candidates[0]
     else:
-        # nobody has a setup this cycle — watch with the current top-scored technique
-        top = max(learning.strategies.values(), key=lambda s: s.score)
-        technique_key, sig = top.key, {"side": None, "reason": "no setup on any technique", "strength": 0.0}
+        # nobody has a setup this cycle — watch with the best technique for this context
+        top_key = max(
+            learning.strategies.keys(),
+            key=lambda k: learning.contextual_score(k, ctx),
+        )
+        technique_key = top_key
+        sig = {"side": None, "reason": "no setup on any technique", "strength": 0.0}
 
     learning.note_technique(technique_key)
     technique_name = learning.name_of(technique_key)
@@ -108,15 +127,39 @@ def run_meeting(symbol: str = "XAUUSD") -> DecisionOut:
     strength = float(sig.get("strength") or 0.0)
     n_setups = len(candidates)
 
+    # ---- Investment Committee: institutional quality gate over the signal ----
+    # A technique proposed `signal_side`; the committee runs a 12-step review and
+    # can VETO it (NO TRADE). Capital preservation first. Toggle via COMMITTEE_ENABLED.
+    scorecard: dict = {}
+    committee_veto = False
+    if signal_side is not None and getattr(settings, "COMMITTEE_ENABLED", True):
+        try:
+            acct = client.account()
+            bid, ask = client.tick(symbol)
+            scorecard = committee.review(
+                symbol=symbol, side=signal_side, technique_name=technique_name, m15=candles,
+                account_balance=float(getattr(acct, "balance", 0.0) or 0.0),
+                account_equity=float(getattr(acct, "equity", 0.0) or 0.0),
+                spread=abs(ask - bid), sl_points=settings.SL_POINTS, tp_points=settings.TP_POINTS,
+            )
+            committee_veto = scorecard.get("recommendation") == "NO TRADE"
+        except Exception as exc:  # noqa: BLE001 — fail SAFE (no trade) on any error
+            scorecard = {"recommendation": "NO TRADE", "summary": f"committee error: {exc}", "total": 0}
+            committee_veto = True
+
     votes: dict[str, str] = {}
-    if signal_side is None:
+    if signal_side is None or committee_veto:
         for _, _n, role, _t in AGENT_DEFS:
             votes[role] = "WAIT"
         decision = "WAIT"
         approved = len(votes)
-        confidence = 42
-        n_enabled = sum(1 for s in learning.strategies.values() if s.enabled)
-        rationale = f"No valid setup on any of {n_enabled} techniques. Watching."
+        if committee_veto:
+            confidence = int(scorecard.get("total", 40) or 40)
+            rationale = "คณะกรรมการลงทุน: NO TRADE — " + scorecard.get("summary", "คุณภาพต่ำกว่าเกณฑ์")
+        else:
+            confidence = 42
+            n_enabled = sum(1 for s in learning.strategies.values() if s.enabled)
+            rationale = f"No valid setup on any of {n_enabled} techniques. Watching."
     else:
         base = signal_side
         for _, _n, role, _t in AGENT_DEFS:
@@ -130,15 +173,18 @@ def run_meeting(symbol: str = "XAUUSD") -> DecisionOut:
         decision = max(tally, key=tally.get)
         approved = sum(1 for v in votes.values() if v == decision)
         agreement = approved / len(votes)
-        confidence = min(99, round(58 + strength * 30 + agreement * 12))
+        # committee's institutional score IS the confidence when it ran
+        confidence = int(scorecard.get("total") or min(99, round(58 + strength * 30 + agreement * 12)))
         rationale = (
-            f"{technique_name}: {sig.get('reason')}. "
-            f"Best of {n_setups} technique(s) with a live setup. "
-            f"{approved}/{len(votes)} agents aligned on {decision}."
+            f"คณะกรรมการอนุมัติ {decision} · {technique_name}: {sig.get('reason')}. "
+            f"คะแนนรวม {scorecard.get('total', '—')}/100 · {approved}/{len(votes)} agents aligned."
         )
 
     return DecisionOut(
         symbol=symbol, decision=decision, confidence=confidence, votes=votes,
         approved=approved, total=len(votes), rationale=rationale,
         technique=technique_key, technique_name=technique_name,
+        context={**ctx, "strength": round(strength, 3), "n_setups": n_setups,
+                 "committee": scorecard},
+        scorecard=scorecard,
     )
