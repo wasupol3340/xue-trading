@@ -18,7 +18,7 @@ export function PortfolioPanel() {
           <div className="flex-1 space-y-2.5">
             <Row label="ยอดเงิน" value={fmtMoney(p.balance)} />
             <Row label="อิควิตี้" value={fmtMoney(p.equity)} />
-            <Row label="กำไร" value={`${fmtSignedMoney(p.profit)} (${fmtPct(p.profitPct)})`} className={signCls(p.profit)} />
+            <Row label="กำไรลอย (ไม้เปิด)" value={`${fmtSignedMoney(p.profit)} (${fmtPct(p.profitPct)})`} className={signCls(p.profit)} />
             <Row label="Drawdown" value={fmtPct(-p.drawdown)} className="text-down" />
           </div>
         </div>
@@ -35,7 +35,7 @@ export function PortfolioPanel() {
         <Panel delay={0.2}>
           <div className="flex items-center gap-2 text-muted">
             <TrendingUp className="h-4 w-4" />
-            <span className="text-[11px] font-semibold uppercase tracking-wider">กำไรรวม</span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider">กำไรลอยตอนนี้</span>
           </div>
           <p className={`mt-2 stat-value ${signCls(p.totalProfit)}`}>{fmtSignedMoney(p.totalProfit)}</p>
         </Panel>
@@ -55,7 +55,7 @@ export function PortfolioPanel() {
           <p className="mt-2 stat-value text-accent-cyan">{p.winRate}%</p>
         </Panel>
         <Panel delay={0.35}>
-          <span className="panel-title">วันนี้</span>
+          <span className="panel-title">กำไรปิดแล้ววันนี้</span>
           <p className={`mt-2 stat-value ${signCls(p.todayProfit)}`}>{fmtSignedMoney(p.todayProfit)}</p>
         </Panel>
       </div>
