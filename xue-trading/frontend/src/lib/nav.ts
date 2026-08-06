@@ -16,6 +16,7 @@ import {
   Landmark,
   GraduationCap,
   NotebookPen,
+  ClipboardList,
 } from "lucide-react";
 
 // รายการเมนูกลาง — ใช้ทั้ง Sidebar (จอใหญ่) และ MobileNav (มือถือ)
@@ -28,6 +29,7 @@ export const NAV = [
   { href: "/boardroom", label: "ประชุมใหญ่ 4 ทุ่ม", icon: Landmark },
   { href: "/experience", label: "ศูนย์ประสบการณ์", icon: GraduationCap },
   { href: "/journal", label: "สมุดบันทึกสมอง", icon: NotebookPen },
+  { href: "/report", label: "รายงานสมองประจำวัน", icon: ClipboardList },
   { href: "/committee", label: "คณะกรรมการ", icon: ShieldCheck },
   { href: "/portfolio", label: "พอร์ตโฟลิโอ", icon: Wallet },
   { href: "/performance", label: "ผลงาน", icon: TrendingUp },
