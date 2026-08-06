@@ -72,6 +72,7 @@ export const api = {
   positions: () => request<any[]>("/trading/positions"),
   history: () => request<any>("/trading/history"),
   agents: () => request<any[]>("/agents"),
+  brainOs: () => request<any>("/agents/brain-os"),
   brains: () => request<any[]>("/agents/brains"),
   reviews: () => request<any[]>("/agents/reviews"),
   agentsLive: () => request<any[]>("/agents/live"),
