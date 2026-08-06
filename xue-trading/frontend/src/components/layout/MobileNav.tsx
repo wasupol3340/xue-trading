@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { NAV } from "@/lib/nav";
+import { NAV_GROUPS } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 
 // ปุ่มเมนู ☰ + ลิ้นชักเมนู สำหรับจอมือถือ (ซ่อนบนจอใหญ่ที่มี Sidebar อยู่แล้ว)
@@ -18,7 +18,9 @@ import { cn } from "@/lib/utils";
 export function MobileNav() {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [groups, setGroups] = useState<Record<number, boolean>>({});
   const pathname = usePathname();
+  const activeGroup = NAV_GROUPS.findIndex((g) => g.items.some((i) => i.href === pathname));
 
   useEffect(() => setMounted(true), []);
 
@@ -62,23 +64,63 @@ export function MobileNav() {
               </button>
             </div>
 
-            <nav className="flex flex-1 flex-col gap-1 overflow-y-auto">
-              {NAV.map((item) => {
-                const active = pathname === item.href;
-                const Icon = item.icon;
+            <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto">
+              {NAV_GROUPS.map((group, gi) => {
+                const renderItem = (item: (typeof group.items)[number], indent?: boolean) => {
+                  const active = pathname === item.href;
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setOpen(false)}
+                      className={cn(
+                        "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-colors",
+                        indent && "pl-4",
+                        active ? "bg-white/[0.06] text-white ring-1 ring-white/10" : "text-muted hover:text-white"
+                      )}
+                    >
+                      <Icon className={cn("h-[18px] w-[18px]", active && "text-brand")} />
+                      {item.label}
+                    </Link>
+                  );
+                };
+
+                if (group.label === null) {
+                  return (
+                    <div key={`top-${gi}`} className="flex flex-col gap-0.5">
+                      {group.items.map((item) => renderItem(item))}
+                    </div>
+                  );
+                }
+                const GroupIcon = group.icon;
+                const expanded = groups[gi] ?? gi === activeGroup;
                 return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className={cn(
-                      "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-colors",
-                      active ? "bg-white/[0.06] text-white ring-1 ring-white/10" : "text-muted hover:text-white"
-                    )}
-                  >
-                    <Icon className={cn("h-[18px] w-[18px]", active && "text-brand")} />
-                    {item.label}
-                  </Link>
+                  <div key={group.label} className="mt-1.5">
+                    <button
+                      onClick={() => setGroups((o) => ({ ...o, [gi]: !expanded }))}
+                      className="flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-[10.5px] font-bold uppercase tracking-wider text-muted/80 hover:text-white"
+                    >
+                      {GroupIcon && <GroupIcon className="h-3.5 w-3.5" />}
+                      <span>{group.label}</span>
+                      <ChevronDown className={cn("ml-auto h-3.5 w-3.5 transition-transform", expanded && "rotate-180")} />
+                    </button>
+                    <AnimatePresence initial={false}>
+                      {expanded && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="flex flex-col gap-0.5 pt-0.5">
+                            {group.items.map((item) => renderItem(item, true))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 );
               })}
             </nav>
