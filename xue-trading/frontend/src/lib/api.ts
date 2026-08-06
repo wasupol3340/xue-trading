@@ -75,6 +75,7 @@ export const api = {
   brains: () => request<any[]>("/agents/brains"),
   reviews: () => request<any[]>("/agents/reviews"),
   agentsLive: () => request<any[]>("/agents/live"),
+  experience: (limit = 60) => request<any>(`/agents/experience?limit=${limit}`),
   boardroom: () => request<any>("/agents/boardroom"),
   boardroomRun: () => request<any>("/agents/boardroom/run", { method: "POST" }),
   decision: () => request<any>("/agents/decision"),
