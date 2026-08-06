@@ -62,7 +62,7 @@ function mapPositions(rows: any[]): Position[] {
   }));
 }
 
-function mapPortfolio(acct: any, status: any): Portfolio {
+function mapPortfolio(acct: any, status: any, history: any): Portfolio {
   const profit = acct.profit ?? acct.equity - acct.balance;
   return {
     balance: acct.balance, equity: acct.equity, profit,
@@ -72,7 +72,8 @@ function mapPortfolio(acct: any, status: any): Portfolio {
     totalProfit: profit,
     todayProfit: status?.realized_pnl_today ?? 0,
     monthProfit: profit,
-    winRate: 0,
+    // อัตราชนะจริงจากประวัติ MT5 (แหล่งเดียวกับหน้า "ผลงาน") — เดิมฮาร์ดโค้ดเป็น 0
+    winRate: history?.stats?.win_rate ?? 0,
     riskMeter: acct.balance ? +Math.max(0, ((acct.balance - acct.equity) / acct.balance) * 100).toFixed(2) : 0,
   };
 }
@@ -114,7 +115,7 @@ export function useBackendSync() {
 
     const poll = async () => {
       try {
-        const [status, account, positions, agents, strategies, decision, news] = await Promise.all([
+        const [status, account, positions, agents, strategies, decision, news, history] = await Promise.all([
           api.status().catch(() => null),
           api.account().catch(() => null),
           api.positions().catch(() => []),
@@ -122,11 +123,12 @@ export function useBackendSync() {
           api.strategies().catch(() => []),
           api.decision().catch(() => null),
           api.news().catch(() => []),
+          api.history().catch(() => null),
         ]);
         if (!alive) return;
 
         const patch: any = { isLive: true };
-        if (account) patch.portfolio = mapPortfolio(account, status);
+        if (account) patch.portfolio = mapPortfolio(account, status, history);
         if (positions?.length !== undefined) patch.positions = mapPositions(positions);
         if (agents?.length) patch.agents = mapAgents(agents);
         if (strategies?.length) patch.strategies = mapStrategies(strategies);
