@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { GraduationCap, TrendingUp, TrendingDown, RefreshCw, AlertTriangle } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { AccountSummaryMT5 } from "@/components/account/AccountSummaryMT5";
 import { api } from "@/lib/api";
 
 type Trade = {
@@ -59,6 +60,9 @@ export default function ExperiencePage() {
           <span className="text-muted">{err}</span>
         </div>
       )}
+
+      {/* สรุปบัญชีตรงกับ MT5 */}
+      <AccountSummaryMT5 />
 
       {/* stats */}
       {stats && (
