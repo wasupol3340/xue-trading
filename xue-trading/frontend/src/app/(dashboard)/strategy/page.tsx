@@ -41,7 +41,7 @@ export default function StrategyPage() {
               <th className="px-4 py-3 font-semibold">อัตราชนะ</th>
               <th className="px-4 py-3 font-semibold">Profit Factor</th>
               <th className="px-4 py-3 font-semibold">Sharpe</th>
-              <th className="px-4 py-3 font-semibold">Max DD</th>
+              <th className="px-4 py-3 font-semibold">Max DD (เซนต์)</th>
               <th className="px-4 py-3 font-semibold">ไม้</th>
               <th className="px-4 py-3 font-semibold">สถานะ</th>
             </tr>
@@ -83,7 +83,7 @@ export default function StrategyPage() {
                 <td className="px-4 py-3 font-mono text-accent-cyan">{s.winRate}%</td>
                 <td className="px-4 py-3 font-mono text-white">{s.profitFactor.toFixed(2)}</td>
                 <td className="px-4 py-3 font-mono text-white">{s.sharpe.toFixed(2)}</td>
-                <td className="px-4 py-3 font-mono text-accent-red">{s.maxDrawdown}%</td>
+                <td className="px-4 py-3 font-mono text-accent-red">{Number(s.maxDrawdown) > 0 ? `−${Number(s.maxDrawdown).toFixed(2)}` : "0.00"}</td>
                 <td className="px-4 py-3 font-mono text-muted">{s.trades}</td>
                 <td className="px-4 py-3">
                   <span className={`chip text-[10px] ${s.enabled ? "border-accent-green/30 bg-accent-green/10 text-accent-green" : "text-muted"}`}>
