@@ -5,7 +5,10 @@ import { useEffect, useState } from "react";
 import { api, isBackendConfigured } from "@/lib/api";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AccountSummaryMT5 } from "@/components/account/AccountSummaryMT5";
-import { fmtMoney, fmtNumber } from "@/lib/utils";
+import { fmtNumber } from "@/lib/utils";
+
+// บัญชีเซนต์: โชว์ตัวเลขดิบเท่า MT5 (ไม่ใส่ $ ไม่แปลงหน่วย)
+const cents = (n: number) => `${n >= 0 ? "+" : ""}${n.toFixed(2)}`;
 
 type Trade = {
   id: string;
@@ -63,7 +66,7 @@ export default function HistoryPage() {
       <div className="mb-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
         <Stat label="ไม้ทั้งหมด" value={`${stats.total}`} />
         <Stat label="อัตราชนะ" value={`${stats.win_rate}%`} tone="text-accent-cyan" />
-        <Stat label="กำไร/ขาดทุนสุทธิ" value={`${stats.net_pnl >= 0 ? "+" : ""}${fmtMoney(stats.net_pnl)}`} tone={stats.net_pnl >= 0 ? "text-up" : "text-down"} />
+        <Stat label="กำไร/ขาดทุนสุทธิ" value={cents(stats.net_pnl)} tone={stats.net_pnl >= 0 ? "text-up" : "text-down"} />
         <Stat label="กลยุทธ์ดีที่สุด" value={stats.best_technique} tone="text-brand" />
       </div>
 
@@ -86,12 +89,12 @@ export default function HistoryPage() {
                 <td className="px-4 py-3 font-mono text-white">{t.lots.toFixed(2)}</td>
                 <td className="px-4 py-3 font-mono text-muted">{fmtNumber(t.entry)}</td>
                 <td className="px-4 py-3 font-mono text-muted">{fmtNumber(t.exit)}</td>
-                <td className={`px-4 py-3 font-mono font-bold ${t.pnl >= 0 ? "text-up" : "text-down"}`}>{t.pnl >= 0 ? "+" : ""}{fmtMoney(t.pnl)}</td>
+                <td className={`px-4 py-3 font-mono font-bold ${t.pnl >= 0 ? "text-up" : "text-down"}`}>{cents(t.pnl)}</td>
                 <td className="px-4 py-3 text-muted">{t.technique}</td>
                 <td className="px-4 py-3">
                   <span className={`chip text-[10px] font-bold uppercase ${t.result === "win" ? "border-accent-green/30 bg-accent-green/10 text-accent-green" : "border-accent-red/30 bg-accent-red/10 text-accent-red"}`}>{t.result === "win" ? "ชนะ" : "แพ้"}</span>
                 </td>
-                <td className="px-4 py-3 text-muted">{t.closed_at ? new Date(t.closed_at * 1000).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "—"}</td>
+                <td className="px-4 py-3 text-muted">{t.closed_at ? new Date(t.closed_at * 1000).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "UTC" }) : "—"}</td>
               </motion.tr>
             ))}
             {loaded && trades.length === 0 && (
