@@ -87,6 +87,7 @@ export const api = {
   reviews: () => request<any[]>("/agents/reviews"),
   agentsLive: () => request<any[]>("/agents/live"),
   experience: (limit = 60) => request<any>(`/agents/experience?limit=${limit}`),
+  accountSummary: () => request<any>("/agents/account-summary"),
   journal: () => request<any>("/agents/journal"),
   report: () => request<any>("/agents/report"),
   boardroom: () => request<any>("/agents/boardroom"),
