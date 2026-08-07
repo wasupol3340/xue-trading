@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Telescope, RefreshCw, AlertTriangle, TrendingUp, TrendingDown, Compass,
-  Layers, PieChart, Clock, ListChecks, Info,
+  Layers, PieChart, Clock, ListChecks, Info, Check,
 } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { api } from "@/lib/api";
 
 type Ctx = { technique: string; context: string; n: number; net: number; win_rate: number };
-type AgendaItem = { priority: "high" | "medium" | "low"; category: string; title: string; rationale: string; status: string };
+type AgendaItem = { priority: "high" | "medium" | "low"; category: string; akey: string; title: string; rationale: string; status: string };
 type Analysis = {
   total_trades: number; early: boolean; data_note: string;
   opportunity_map: { profitable: Ctx[]; draining: Ctx[] };
@@ -37,6 +37,9 @@ export default function StrategistPage() {
     catch (e: any) { setErr(e?.message || "โหลดข้อมูลไม่ได้"); }
     finally { setLoading(false); }
   };
+  const approve = async (akey: string) => { try { await api.strategistApprove(akey); await load(); } catch { /* ignore */ } };
+  const unapprove = async (akey: string) => { try { await api.strategistUnapprove(akey); await load(); } catch { /* ignore */ } };
+
   useEffect(() => { load(); const iv = setInterval(load, 20000); return () => clearInterval(iv); }, []);
 
   return (
@@ -84,7 +87,18 @@ export default function StrategistPage() {
                         <span className="rounded px-1.5 py-0.5 text-[10px] font-bold" style={{ background: `${p.c}18`, color: p.c }}>{p.label}</span>
                         <span className="rounded px-1.5 py-0.5 text-[10px] text-muted" style={{ background: "#ffffff08" }}>{it.category}</span>
                         <span className="text-[13px] font-bold text-white">{it.title}</span>
-                        <span className="ml-auto text-[10px] text-muted">รออนุมัติ</span>
+                        {it.status === "approved" ? (
+                          <button onClick={() => unapprove(it.akey)}
+                            className="ml-auto inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-bold"
+                            style={{ background: "#22c55e18", color: "#22c55e" }} title="กดเพื่อยกเลิกการอนุมัติ">
+                            <Check className="h-3 w-3" /> อนุมัติแล้ว
+                          </button>
+                        ) : (
+                          <button onClick={() => approve(it.akey)}
+                            className="ml-auto rounded-md border border-brand/40 bg-brand/10 px-2.5 py-0.5 text-[10px] font-bold text-brand hover:bg-brand/20">
+                            อนุมัติ
+                          </button>
+                        )}
                       </div>
                       <p className="text-[12px] text-white/70">{it.rationale}</p>
                     </motion.div>
