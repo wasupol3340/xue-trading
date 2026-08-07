@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { api, isBackendConfigured } from "@/lib/api";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { AccountSummaryMT5 } from "@/components/account/AccountSummaryMT5";
 import { fmtMoney, fmtNumber } from "@/lib/utils";
 
 type Trade = {
@@ -55,6 +56,10 @@ export default function HistoryPage() {
   return (
     <div>
       <PageHeader title="ประวัติการเทรด" subtitle="ทุกไม้ที่ทีม AI ปิดจริงจาก MT5 พร้อมราคาเข้า/ออกและกลยุทธ์ที่ใช้" />
+
+      {/* สรุปบัญชีตรงกับ MT5 */}
+      <AccountSummaryMT5 />
+
       <div className="mb-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
         <Stat label="ไม้ทั้งหมด" value={`${stats.total}`} />
         <Stat label="อัตราชนะ" value={`${stats.win_rate}%`} tone="text-accent-cyan" />
