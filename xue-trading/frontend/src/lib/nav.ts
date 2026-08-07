@@ -20,6 +20,7 @@ import {
   BrainCircuit,
   Crown,
   ShieldAlert,
+  Target,
   type LucideIcon,
 } from "lucide-react";
 
@@ -41,6 +42,7 @@ export const NAV_GROUPS: NavGroup[] = [
     icon: Building2,
     items: [
       { href: "/headquarters", label: "สำนักงานใหญ่ AI", icon: Building2 },
+      { href: "/goals", label: "เป้าหมายบริษัท", icon: Target },
       { href: "/agents", label: "ทีม AI", icon: Bot },
       { href: "/ceo-brain", label: "สมอง CEO", icon: Crown },
       { href: "/research", label: "ห้องวิจัย", icon: FlaskConical },
