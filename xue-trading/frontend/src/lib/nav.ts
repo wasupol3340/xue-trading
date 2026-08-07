@@ -22,6 +22,7 @@ import {
   ShieldAlert,
   Target,
   Telescope,
+  ClipboardCheck,
   type LucideIcon,
 } from "lucide-react";
 
@@ -78,6 +79,7 @@ export const NAV_GROUPS: NavGroup[] = [
     icon: Settings,
     items: [
       { href: "/guardian", label: "ทีมเทคนิค (ความปลอดภัย)", icon: ShieldAlert },
+      { href: "/auditor", label: "ผู้ตรวจสอบบัญชี", icon: ClipboardCheck },
       { href: "/news", label: "ข่าวเศรษฐกิจ", icon: Newspaper },
       { href: "/logs", label: "บันทึกระบบ", icon: ScrollText },
       { href: "/settings", label: "ตั้งค่า", icon: Settings },
