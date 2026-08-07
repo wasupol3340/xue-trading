@@ -78,6 +78,8 @@ export const api = {
   strategist: () => request<any>("/agents/strategist"),
   strategistApprove: (akey: string) => request<any>(`/agents/strategist/approve?akey=${encodeURIComponent(akey)}`, { method: "POST" }),
   strategistUnapprove: (akey: string) => request<any>(`/agents/strategist/unapprove?akey=${encodeURIComponent(akey)}`, { method: "POST" }),
+  auditor: () => request<any>("/agents/auditor"),
+  auditorRun: () => request<any>("/agents/auditor/run", { method: "POST" }),
   guardian: () => request<any>("/agents/guardian"),
   guardianScan: () => request<any>("/agents/guardian/scan", { method: "POST" }),
   guardianAck: (id: number) => request<any>(`/agents/guardian/ack?id=${id}`, { method: "POST" }),
