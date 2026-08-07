@@ -74,6 +74,7 @@ export const api = {
   agents: () => request<any[]>("/agents"),
   brainOs: () => request<any>("/agents/brain-os"),
   ceoBrain: () => request<any>("/agents/ceo-brain"),
+  goals: () => request<any>("/agents/goals"),
   guardian: () => request<any>("/agents/guardian"),
   guardianScan: () => request<any>("/agents/guardian/scan", { method: "POST" }),
   guardianAck: (id: number) => request<any>(`/agents/guardian/ack?id=${id}`, { method: "POST" }),
