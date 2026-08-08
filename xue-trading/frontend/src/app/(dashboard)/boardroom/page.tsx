@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Landmark, Play, RefreshCw, Loader2, AlertTriangle } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { api } from "@/lib/api";
+import { useAccountStore } from "@/store/useAccountStore";
 
 type Turn = { id: string; text: string };
 type Meeting = {
@@ -32,10 +33,13 @@ export default function BoardroomPage() {
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState(false);
+  const currentId = useAccountStore((s) => s.currentId);
+  const accounts = useAccountStore((s) => s.accounts);
+  const loadAccounts = useAccountStore((s) => s.load);
 
   const load = async () => {
     try {
-      const m = (await api.boardroom()) as Meeting;
+      const m = (await api.boardroom(currentId || undefined)) as Meeting;
       setMtg(m);
       setErr("");
     } catch (e: any) {
@@ -45,13 +49,17 @@ export default function BoardroomPage() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { loadAccounts(); }, [loadAccounts]);
+  useEffect(() => { load(); }, [currentId]);
+
+  const acc = accounts.find((a) => a.id === currentId);
+  const assetLabel = acc ? (acc.asset === "crypto" ? "คริปโต" : acc.asset === "gold" ? "ทอง" : acc.asset) : "";
 
   const runNow = async () => {
     setRunning(true);
     setErr("");
     try {
-      const m = (await api.boardroomRun()) as Meeting;
+      const m = (await api.boardroomRun(currentId || undefined)) as Meeting;
       setMtg(m);
     } catch (e: any) {
       setErr(e?.message || "จัดประชุมไม่สำเร็จ");
@@ -65,8 +73,8 @@ export default function BoardroomPage() {
   return (
     <div>
       <PageHeader
-        title="ประชุมใหญ่ 4 ทุ่ม"
-        subtitle="ทีม AI ประชุมกันจริงทุกวันทำการ 22:00 น. — CEO สรุปผล ทุกฝ่ายออกความเห็น ที่ปรึกษา AI ร่วมสอนงาน (เป็นคำแนะนำ ไม่เปลี่ยนการเทรดอัตโนมัติ)"
+        title={`ประชุมใหญ่ 4 ทุ่ม${assetLabel ? ` · ทีม${assetLabel}` : ""}`}
+        subtitle={`ประชุมของทีม "${acc?.name || "ที่เลือก"}" ทุกวัน 22:00 น. (ทีมทอง/คริปโตประชุมแยกกัน คนละอัน) — CEO สรุปผล ทุกฝ่ายออกความเห็น (เป็นคำแนะนำ ไม่เปลี่ยนการเทรดอัตโนมัติ)`}
         action={
           <div className="flex gap-2">
             <button
