@@ -107,7 +107,7 @@ export const api = {
   boardroom: () => request<any>("/agents/boardroom"),
   boardroomRun: () => request<any>("/agents/boardroom/run", { method: "POST" }),
   decision: () => request<any>("/agents/decision"),
-  strategies: () => request<any[]>("/strategies"),
+  strategies: (accountId?: number) => request<any[]>(`/strategies${accountId ? `?account_id=${accountId}` : ""}`),
   news: () => request<any[]>("/news"),
 
   startEngine: () => request("/trading/start", { method: "POST" }),
