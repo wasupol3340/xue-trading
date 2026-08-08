@@ -49,9 +49,15 @@ export function PortfolioPanel() {
   const openCount = isCrypto ? Number(c?.open_count ?? 0) : p.openPositions;
   const winRate = isCrypto ? Number(c?.win_rate ?? 0) : p.winRate;
   const todayProfit = isCrypto ? Number(c?.realized_today ?? 0) : p.todayProfit;
-  const profitPct = isCrypto ? (balance ? Number((((equity - balance) / balance) * 100).toFixed(2)) : 0) : p.profitPct;
-  const drawdown = isCrypto ? (balance ? Math.max(0, Number((((balance - equity) / balance) * 100).toFixed(2))) : 0) : p.drawdown;
-  const riskMeter = isCrypto ? Math.min(100, Math.abs(profitPct)) : p.riskMeter;
+  // คริปโต: กำไร% = กำไรลอย ÷ อิควิตี้ (ไม่ใช่เทียบกับเงินสดที่เหลือ ซึ่งทำให้พุ่งผิดปกติ)
+  const profitPct = isCrypto
+    ? (equity ? Number(((floating / equity) * 100).toFixed(2)) : 0)
+    : p.profitPct;
+  const drawdown = isCrypto ? Math.max(0, -profitPct) : p.drawdown;
+  // คริปโต: มิเตอร์ความเสี่ยง = สัดส่วนเงินที่ลงเหรียญอยู่ (exposure) = (อิควิตี้-เงินสด)/อิควิตี้
+  const riskMeter = isCrypto
+    ? (equity ? Math.min(100, Math.max(0, Number((((equity - balance) / equity) * 100).toFixed(2)))) : 0)
+    : p.riskMeter;
 
   const M = isCrypto ? money : (v: number) => fmtMoney(v);
   const SM = isCrypto ? signedMoney : (v: number) => fmtSignedMoney(v);
