@@ -5,17 +5,22 @@ import { AlertTriangle } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AgentLiveCard, AgentLive } from "@/components/agents/AgentLiveCard";
 import { api } from "@/lib/api";
+import { useAccountStore } from "@/store/useAccountStore";
 
 export default function AgentsPage() {
   const [agents, setAgents] = useState<AgentLive[]>([]);
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(true);
+  const currentId = useAccountStore((s) => s.currentId);
+  const accounts = useAccountStore((s) => s.accounts);
+  const loadAccounts = useAccountStore((s) => s.load);
 
+  useEffect(() => { loadAccounts(); }, [loadAccounts]);
   useEffect(() => {
     let alive = true;
     const load = async () => {
       try {
-        const rows = (await api.agentsLive()) as AgentLive[];
+        const rows = (await api.agentsLive(currentId || undefined)) as AgentLive[];
         if (!alive) return;
         setAgents(rows);
         setErr("");
@@ -28,18 +33,20 @@ export default function AgentsPage() {
     load();
     const id = setInterval(load, 8000);
     return () => { alive = false; clearInterval(id); };
-  }, []);
+  }, [currentId]);
 
   const online = agents.length;
+  const acc = accounts.find((a) => a.id === currentId);
+  const assetLabel = acc ? (acc.asset === "crypto" ? "คริปโต" : acc.asset === "gold" ? "ทอง" : acc.asset) : "";
 
   return (
     <div>
       <PageHeader
         title="ทีม AI"
-        subtitle="แดชบอร์ดสดของ AI แต่ละตัว — เห็นว่าตอนนี้แต่ละตัวอ่านตลาด/ทำงานอะไรอยู่ (ข้อมูลจริง อัปเดตทุก 8 วิ)"
+        subtitle={`ทีม AI ของบัญชี "${acc?.name || "ที่เลือก"}" — ${assetLabel ? `ทีม${assetLabel}แยกจากทีมอื่น ไม่ปนกัน · ` : ""}เห็นว่าตอนนี้แต่ละตัวอ่านตลาด/ทำงานอะไรอยู่ (อัปเดตทุก 8 วิ)`}
         action={
           <span className="chip border-accent-green/30 bg-accent-green/10 text-accent-green">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-green" /> {online}/8 ออนไลน์
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-green" /> {online}/8 ออนไลน์{assetLabel ? ` · ทีม${assetLabel}` : ""}
           </span>
         }
       />
