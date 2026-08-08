@@ -70,7 +70,7 @@ export const api = {
   status: () => request<any>("/trading/status"),
   account: () => request<any>("/trading/account"),
   positions: () => request<any[]>("/trading/positions"),
-  history: () => request<any>("/trading/history"),
+  history: (accountId?: number) => request<any>(`/trading/history${accountId ? `?account_id=${accountId}` : ""}`),
   agents: () => request<any[]>("/agents"),
   brainOs: () => request<any>("/agents/brain-os"),
   ceoBrain: () => request<any>("/agents/ceo-brain"),
@@ -86,7 +86,8 @@ export const api = {
   brains: () => request<any[]>("/agents/brains"),
   reviews: () => request<any[]>("/agents/reviews"),
   agentsLive: () => request<any[]>("/agents/live"),
-  experience: (limit = 60) => request<any>(`/agents/experience?limit=${limit}`),
+  experience: (limit = 60, accountId?: number) =>
+    request<any>(`/agents/experience?limit=${limit}${accountId ? `&account_id=${accountId}` : ""}`),
   accountSummary: (accountId?: number) =>
     request<any>(`/agents/account-summary${accountId ? `?account_id=${accountId}` : ""}`),
   accounts: () => request<any>("/agents/accounts"),
