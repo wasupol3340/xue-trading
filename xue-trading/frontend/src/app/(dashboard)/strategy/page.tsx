@@ -1,7 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useTradingStore } from "@/store/useTradingStore";
+import { useAccountStore } from "@/store/useAccountStore";
+import { api } from "@/lib/api";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Meter } from "@/components/ui/Meter";
 
@@ -19,16 +22,40 @@ function scoreColor(s: number) {
 }
 
 export default function StrategyPage() {
-  const strategies = useTradingStore((s) => s.strategies);
   const currentTechnique = useTradingStore((s) => s.currentTechnique);
-  const sorted = [...strategies].sort((a, b) => b.score - a.score);
+  const currentId = useAccountStore((s) => s.currentId);
+  const accounts = useAccountStore((s) => s.accounts);
+  const loadAccounts = useAccountStore((s) => s.load);
+  const [sorted, setSorted] = useState<any[]>([]);
+
+  useEffect(() => { loadAccounts(); }, [loadAccounts]);
+  useEffect(() => {
+    let alive = true;
+    const load = async () => {
+      try {
+        const raw = await api.strategies(currentId || undefined);
+        const mapped = (raw || []).map((s: any) => ({
+          id: s.key, name: s.name, category: s.category, score: s.score,
+          confidence: s.confidence, winRate: s.win_rate, profitFactor: s.profit_factor,
+          sharpe: s.sharpe, maxDrawdown: s.max_drawdown, trades: s.trades, enabled: !!s.enabled,
+        }));
+        if (alive) setSorted(mapped.sort((a: any, b: any) => b.score - a.score));
+      } catch { /* keep */ }
+    };
+    load();
+    const iv = setInterval(load, 20000);
+    return () => { alive = false; clearInterval(iv); };
+  }, [currentId]);
+
+  const acc = accounts.find((a) => a.id === currentId);
+  const assetLabel = acc ? (acc.asset === "crypto" ? "คริปโต" : acc.asset === "gold" ? "ทอง" : acc.asset) : "";
 
   return (
     <div>
       <PageHeader
         title="ศูนย์กลยุทธ์"
-        subtitle="เครื่องยนต์เรียนรู้ด้วยตัวเอง — Learning AI อัปเดตคะแนน อัตราชนะ profit factor Sharpe และ drawdown ของแต่ละกลยุทธ์โดยอัตโนมัติ"
-        action={<span className="chip border-accent-violet/30 bg-accent-violet/10 text-accent-violet">Reinforcement Learning · สด</span>}
+        subtitle={`สมองการเทรดของ "${assetLabel || "บัญชีที่เลือก"}" — เรียนรู้แยกตามสินทรัพย์ ไม่ปนกัน · คะแนน/อัตราชนะ/PF/Sharpe/DD อัปเดตจากไม้จริงของสินทรัพย์นี้`}
+        action={<span className="chip border-accent-violet/30 bg-accent-violet/10 text-accent-violet">สมอง{assetLabel} · สด</span>}
       />
 
       <div className="glass overflow-x-auto p-0">
@@ -92,6 +119,13 @@ export default function StrategyPage() {
                 </td>
               </motion.tr>
             ))}
+            {sorted.length === 0 && (
+              <tr>
+                <td colSpan={9} className="px-4 py-10 text-center text-muted">
+                  ยังไม่มีสถิติเทคนิคของ{assetLabel ? `สินทรัพย์ "${assetLabel}"` : "บัญชีนี้"} — สมองจะเริ่มเรียนรู้เมื่อมีไม้ปิดของสินทรัพย์นี้
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
