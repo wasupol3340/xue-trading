@@ -6,6 +6,7 @@ import { api, isBackendConfigured } from "@/lib/api";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AccountSummaryMT5 } from "@/components/account/AccountSummaryMT5";
 import { fmtNumber } from "@/lib/utils";
+import { useAccountStore } from "@/store/useAccountStore";
 
 // บัญชีเซนต์: โชว์ตัวเลขดิบเท่า MT5 (ไม่ใส่ $ ไม่แปลงหน่วย)
 const cents = (n: number) => `${n >= 0 ? "+" : ""}${n.toFixed(2)}`;
@@ -29,6 +30,10 @@ export default function HistoryPage() {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [stats, setStats] = useState<Stats>({ total: 0, win_rate: 0, net_pnl: 0, best_technique: "—" });
   const [loaded, setLoaded] = useState(false);
+  const currentId = useAccountStore((s) => s.currentId);
+  const loadAccounts = useAccountStore((s) => s.load);
+
+  useEffect(() => { loadAccounts(); }, [loadAccounts]);
 
   useEffect(() => {
     if (!isBackendConfigured()) {
@@ -38,7 +43,7 @@ export default function HistoryPage() {
     let alive = true;
     const load = async () => {
       try {
-        const res = await api.history();
+        const res = await api.history(currentId || undefined);
         if (!alive) return;
         setTrades(res.trades || []);
         setStats(res.stats || { total: 0, win_rate: 0, net_pnl: 0, best_technique: "—" });
@@ -54,7 +59,7 @@ export default function HistoryPage() {
       alive = false;
       clearInterval(iv);
     };
-  }, []);
+  }, [currentId]);
 
   return (
     <div>
