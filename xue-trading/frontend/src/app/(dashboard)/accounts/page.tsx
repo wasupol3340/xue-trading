@@ -158,6 +158,8 @@ export default function AccountsPage() {
               </div>
               {summaries[a.id] && <AccountSummaryLine s={summaries[a.id]} />}
 
+              {a.broker?.startsWith("binance") && <CryptoSettings accountId={a.id} />}
+
               <div className="mt-3 flex items-center justify-between">
                 <span className="text-[11px] text-muted">สร้างเมื่อ {a.created_at || "—"}</span>
                 {active ? (
@@ -265,5 +267,78 @@ function Cell({ label, value, tone }: { label: string; value: string; tone: stri
       <p className="text-[10px] text-muted">{label}</p>
       <p className={`font-mono text-sm font-bold ${tone}`}>{value}</p>
     </div>
+  );
+}
+
+// ตั้งค่าเทรดคริปโตรายบัญชี (฿/ไม้, SL%, TP%, เปิด/ปิดเทรด) — ตั้งบนเว็บได้
+function CryptoSettings({ accountId }: { accountId: number }) {
+  const [open, setOpen] = useState(false);
+  const [s, setS] = useState<any>(null);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState("");
+
+  const loadS = async () => {
+    try { setS(await api.accountSettings(accountId)); } catch { /* ignore */ }
+  };
+  useEffect(() => { if (open && !s) loadS(); /* eslint-disable-next-line */ }, [open]);
+
+  const save = async (patch: any) => {
+    setSaving(true); setMsg("");
+    try {
+      const r = await api.accountSettingsSet(accountId, patch);
+      if (r?.ok === false) throw new Error(r?.error || "บันทึกไม่สำเร็จ");
+      setS(r); setMsg("บันทึกแล้ว ✓");
+    } catch (e: any) { setMsg(e?.message || "บันทึกไม่สำเร็จ"); }
+    finally { setSaving(false); }
+  };
+
+  return (
+    <div className="mt-3">
+      <button onClick={() => setOpen((o) => !o)} className="text-[11px] text-accent-cyan hover:underline">
+        {open ? "▾ ซ่อนตั้งค่าเทรด" : "▸ ตั้งค่าเทรด (฿/ไม้, SL/TP, เปิดเทรด)"}
+      </button>
+      {open && s && (
+        <div className="mt-2 rounded-lg border border-white/[0.06] bg-black/20 p-3">
+          <div className="grid grid-cols-3 gap-2">
+            <NumField label="฿/ไม้ (ขั้นต่ำ 300)" value={s.trade_size_thb} min={s.min_notional_thb || 300}
+              onSave={(v) => save({ trade_size_thb: v })} />
+            <NumField label="SL %" value={s.sl_pct} onSave={(v) => save({ sl_pct: v })} />
+            <NumField label="TP %" value={s.tp_pct} onSave={(v) => save({ tp_pct: v })} />
+          </div>
+          <div className="mt-3 flex items-center justify-between">
+            <span className="text-[11px] text-muted">เปิดให้บัญชีนี้เทรดจริง</span>
+            <button
+              onClick={() => save({ trade_enabled: s.trade_enabled ? 0 : 1 })}
+              disabled={saving}
+              className={`chip text-[11px] ${s.trade_enabled ? "border-accent-green/30 bg-accent-green/10 text-accent-green" : "border-white/10 bg-white/[0.03] text-muted"}`}
+            >
+              {s.trade_enabled ? "เปิดอยู่ (กดเพื่อปิด)" : "ปิดอยู่ (กดเพื่อเปิด)"}
+            </button>
+          </div>
+          {msg && <p className="mt-2 text-[10px] text-muted">{msg}</p>}
+          <p className="mt-2 text-[10px] text-muted">
+            * ต้องตั้ง <code>CRYPTO_TRADING_ENABLED=true</code> ใน .env ด้วย ระบบถึงจะเทรดจริง (สวิตช์ใหญ่)
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NumField({ label, value, min, onSave }: { label: string; value: number; min?: number; onSave: (v: number) => void }) {
+  const [v, setV] = useState(String(value ?? ""));
+  useEffect(() => { setV(String(value ?? "")); }, [value]);
+  return (
+    <label className="block">
+      <span className="mb-1 block text-[10px] text-muted">{label}</span>
+      <input
+        type="number"
+        value={v}
+        min={min}
+        onChange={(e) => setV(e.target.value)}
+        onBlur={() => { const num = parseFloat(v); if (!isNaN(num) && num !== value) onSave(num); }}
+        className="w-full rounded-md border border-white/10 bg-white/[0.03] px-2 py-1 text-sm text-white focus:border-accent-violet/50 focus:outline-none"
+      />
+    </label>
   );
 }
