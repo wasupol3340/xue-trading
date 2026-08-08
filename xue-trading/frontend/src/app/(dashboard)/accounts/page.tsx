@@ -10,11 +10,12 @@ import { useAccountStore } from "@/store/useAccountStore";
 const ASSET_ICON: Record<string, string> = { gold: "🥇", crypto: "₿", oil: "🛢️", forex: "💱" };
 const ASSET_LABEL: Record<string, string> = { gold: "ทอง", crypto: "คริปโต", oil: "น้ำมัน", forex: "คู่เงิน" };
 const ASSETS = ["gold", "crypto", "oil", "forex"];
-const BROKERS = ["mt5", "binance-futures", "binance-spot"];
+const BROKERS = ["mt5", "binance-th", "binance-spot", "binance-futures"];
 // ตัวอย่างคู่เทรดตามโบรก (ผู้ใช้พิมพ์เองได้)
 const PAIR_HINT: Record<string, string> = {
-  "binance-futures": "เช่น BTCUSDT, ETHUSDT (futures = USDT-margined)",
-  "binance-spot": "เช่น BTCUSDT, ETHUSDT, BTCTHB (spot)",
+  "binance-th": "Binance TH (บาท, spot) — เช่น BTCTHB, ETHTHB, USDTTHB",
+  "binance-spot": "Binance global (spot) — เช่น BTCUSDT, ETHUSDT",
+  "binance-futures": "Binance global (futures USDT-M) — เช่น BTCUSDT, ETHUSDT",
   mt5: "เช่น XAUUSD.sc",
 };
 
@@ -22,7 +23,7 @@ export default function AccountsPage() {
   const { accounts, currentId, load, setCurrent } = useAccountStore();
   const [err, setErr] = useState("");
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ name: "", broker: "binance-futures", asset: "crypto", market: "" });
+  const [form, setForm] = useState({ name: "", broker: "binance-th", asset: "crypto", market: "" });
   const [busy, setBusy] = useState(false);
   const [summaries, setSummaries] = useState<Record<number, any>>({});
 
