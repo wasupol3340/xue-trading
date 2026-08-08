@@ -95,6 +95,12 @@ export const api = {
       `/agents/accounts?name=${encodeURIComponent(p.name)}&broker=${encodeURIComponent(p.broker)}&asset=${encodeURIComponent(p.asset)}&market=${encodeURIComponent(p.market)}`,
       { method: "POST" }
     ),
+  accountSettings: (id: number) => request<any>(`/agents/account-settings?account_id=${id}`),
+  accountSettingsSet: (id: number, p: { trade_size_thb?: number; sl_pct?: number; tp_pct?: number; trade_enabled?: number }) => {
+    const q = Object.entries(p).filter(([, v]) => v !== undefined && v !== null).map(([k, v]) => `${k}=${v}`).join("&");
+    return request<any>(`/agents/account-settings?account_id=${id}${q ? "&" + q : ""}`, { method: "POST" });
+  },
+  cryptoStatus: () => request<any>("/agents/crypto-status"),
   journal: () => request<any>("/agents/journal"),
   report: () => request<any>("/agents/report"),
   boardroom: () => request<any>("/agents/boardroom"),
