@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { api, isBackendConfigured } from "@/lib/api";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { fmtMoney } from "@/lib/utils";
+import { useAccountStore } from "@/store/useAccountStore";
 
 type Trade = { pnl: number; technique: string; closed_at: number; result: string };
 type Stats = { total: number; win_rate: number; net_pnl: number; best_technique: string };
@@ -12,13 +13,16 @@ export default function PerformancePage() {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [stats, setStats] = useState<Stats>({ total: 0, win_rate: 0, net_pnl: 0, best_technique: "—" });
   const [loaded, setLoaded] = useState(false);
+  const currentId = useAccountStore((s) => s.currentId);
+  const loadAccounts = useAccountStore((s) => s.load);
 
+  useEffect(() => { loadAccounts(); }, [loadAccounts]);
   useEffect(() => {
     if (!isBackendConfigured()) { setLoaded(true); return; }
     let alive = true;
     const load = async () => {
       try {
-        const res = await api.history();
+        const res = await api.history(currentId || undefined);
         if (!alive) return;
         setTrades(res.trades || []);
         setStats(res.stats || { total: 0, win_rate: 0, net_pnl: 0, best_technique: "—" });
@@ -27,7 +31,7 @@ export default function PerformancePage() {
     load();
     const iv = setInterval(load, 20000);
     return () => { alive = false; clearInterval(iv); };
-  }, []);
+  }, [currentId]);
 
   // equity curve = cumulative realized P&L over time (oldest -> newest)
   const chrono = [...trades].sort((a, b) => a.closed_at - b.closed_at);
