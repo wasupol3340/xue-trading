@@ -1,9 +1,12 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ShieldCheck, CheckCircle2, AlertTriangle, Sparkles } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useTradingStore } from "@/store/useTradingStore";
+import { useAccountStore } from "@/store/useAccountStore";
+import { api } from "@/lib/api";
 
 const CAT: [string, string][] = [
   ["structure", "โครงสร้าง / Regime"],
@@ -28,20 +31,49 @@ const verdictStyle = (r: string) =>
   : { c: "#8b90a0", t: "ไม่เทรด (NO TRADE)" };
 
 export default function CommitteePage() {
-  const sc = useTradingStore((s) => s.scorecard) || {};
+  const storeSc = useTradingStore((s) => s.scorecard) || {};
   const lastAction = useTradingStore((s) => s.lastAction);
   const lastActionAt = useTradingStore((s) => s.lastActionAt);
   const advisorText = useTradingStore((s) => s.advisorText);
+
+  // แยกตามบัญชี: บัญชีคริปโต → คณะกรรมการของทีมคริปโต (ดึงมติสด), ทอง → สโตร์เทรดสด
+  const currentId = useAccountStore((s) => s.currentId);
+  const accounts = useAccountStore((s) => s.accounts);
+  const loadAccounts = useAccountStore((s) => s.load);
+  const acc = accounts.find((a) => a.id === currentId);
+  const isCrypto = !!acc && (acc.asset === "crypto" || String(acc.broker || "").startsWith("binance"));
+  const assetLabel = acc ? (acc.asset === "crypto" ? "คริปโต" : acc.asset === "gold" ? "ทอง" : acc.asset) : "";
+  const [remote, setRemote] = useState<any>(null);
+
+  useEffect(() => { loadAccounts(); }, [loadAccounts]);
+  useEffect(() => {
+    if (!isCrypto) { setRemote(null); return; }
+    let alive = true;
+    const load = async () => {
+      try { const r = await api.decision(currentId || undefined); if (alive) setRemote(r); } catch { /* keep */ }
+    };
+    load();
+    const iv = setInterval(load, 15000);
+    return () => { alive = false; clearInterval(iv); };
+  }, [currentId, isCrypto]);
+
+  const sc = isCrypto ? (remote?.scorecard || {}) : storeSc;
   const has = !!sc.recommendation;
   const v = verdictStyle(sc.recommendation || "NO TRADE");
   const scores = sc.scores || {};
-  const executed = (lastAction || "").includes("ส่งออเดอร์แล้ว");
+  const cryptoAction = remote
+    ? (remote.decision === "BUY" ? "คณะกรรมการคริปโตอนุมัติ ส่งออเดอร์แล้ว" : "คณะกรรมการคริปโต: ยังไม่เข้าไม้")
+    : "";
+  const lastActionShown = isCrypto ? cryptoAction : lastAction;
+  const executed = isCrypto ? (remote?.decision === "BUY") : (lastAction || "").includes("ส่งออเดอร์แล้ว");
 
   return (
     <div>
       <PageHeader
-        title="คณะกรรมการลงทุน"
-        subtitle="การตัดสินใจจริงล่าสุดของบอท (อัปเดตทุกรอบประชุม) — สิ่งที่เห็นคือสิ่งที่บอททำจริง"
+        title={`คณะกรรมการลงทุน${assetLabel ? ` · ทีม${assetLabel}` : ""}`}
+        subtitle={isCrypto
+          ? `คณะกรรมการของทีมคริปโต (บัญชี "${acc?.name || ""}") — กลั่นกรองทุกสัญญาณก่อนยิงจริง แยกจากทีมทอง ไม่ปนกัน`
+          : "การตัดสินใจจริงล่าสุดของบอท (อัปเดตทุกรอบประชุม) — สิ่งที่เห็นคือสิ่งที่บอททำจริง"}
       />
 
       {/* ผลรอบล่าสุดจริงของบอท + เหตุผลว่าออก/ไม่ออกออเดอร์ */}
@@ -58,11 +90,11 @@ export default function CommitteePage() {
           </span>
           <div>
             <p className="text-[11px] uppercase tracking-wider text-muted">ผลรอบล่าสุดของบอท</p>
-            <p className="text-sm font-semibold text-white">{lastAction || "ยังไม่ได้ประเมินรอบแรก (รอสูงสุด 15 นาที)"}</p>
+            <p className="text-sm font-semibold text-white">{lastActionShown || "ยังไม่ได้ประเมินรอบแรก (รอสูงสุด 15 นาที)"}</p>
           </div>
         </div>
         <span className="font-mono text-[11px] text-muted">
-          ประเมินเมื่อ {lastActionAt || "—"} · อัปเดตทุกรอบประชุม
+          {isCrypto ? "อัปเดตสดทุก 15 วิ" : `ประเมินเมื่อ ${lastActionAt || "—"} · อัปเดตทุกรอบประชุม`}
         </span>
       </div>
 
@@ -70,7 +102,7 @@ export default function CommitteePage() {
         <div className="glass flex flex-col items-center gap-3 p-12 text-center">
           <ShieldCheck className="h-10 w-10 text-muted" />
           <p className="text-sm text-muted">
-            {lastAction
+            {lastActionShown
               ? "รอบล่าสุดยังไม่มีเทคนิคเข้าเงื่อนไข — คณะกรรมการจะลงคะแนนเต็ม 13 หมวดเมื่อมีสัญญาณให้ตรวจ (ดูสถานะรอบล่าสุดด้านบน)"
               : "รอบอทประชุมรอบแรก แล้วคณะกรรมการจะลงความเห็นที่นี่"}
           </p>
