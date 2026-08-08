@@ -23,6 +23,7 @@ import {
   Target,
   Telescope,
   ClipboardCheck,
+  Layers,
   type LucideIcon,
 } from "lucide-react";
 
@@ -37,6 +38,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/dashboard", label: "แดชบอร์ด", icon: LayoutDashboard },
       { href: "/brain-os", label: "Brain OS", icon: BrainCircuit },
+      { href: "/accounts", label: "บัญชีทั้งหมด", icon: Layers },
     ],
   },
   {
