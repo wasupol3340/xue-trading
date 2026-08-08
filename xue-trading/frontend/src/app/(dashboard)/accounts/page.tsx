@@ -10,18 +10,41 @@ import { useAccountStore } from "@/store/useAccountStore";
 const ASSET_ICON: Record<string, string> = { gold: "🥇", crypto: "₿", oil: "🛢️", forex: "💱" };
 const ASSET_LABEL: Record<string, string> = { gold: "ทอง", crypto: "คริปโต", oil: "น้ำมัน", forex: "คู่เงิน" };
 const ASSETS = ["gold", "crypto", "oil", "forex"];
-const BROKERS = ["mt5", "binance"];
+const BROKERS = ["mt5", "binance-futures", "binance-spot"];
+// ตัวอย่างคู่เทรดตามโบรก (ผู้ใช้พิมพ์เองได้)
+const PAIR_HINT: Record<string, string> = {
+  "binance-futures": "เช่น BTCUSDT, ETHUSDT (futures = USDT-margined)",
+  "binance-spot": "เช่น BTCUSDT, ETHUSDT, BTCTHB (spot)",
+  mt5: "เช่น XAUUSD.sc",
+};
 
 export default function AccountsPage() {
   const { accounts, currentId, load, setCurrent } = useAccountStore();
   const [err, setErr] = useState("");
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ name: "", broker: "binance", asset: "crypto", market: "" });
+  const [form, setForm] = useState({ name: "", broker: "binance-futures", asset: "crypto", market: "" });
   const [busy, setBusy] = useState(false);
+  const [summaries, setSummaries] = useState<Record<number, any>>({});
 
   useEffect(() => {
     load();
   }, [load]);
+
+  // ดึงสรุปสด (ยอด/PnL) ของแต่ละบัญชี — MT5 หรือ Binance ตามโบรก
+  useEffect(() => {
+    let alive = true;
+    accounts.forEach(async (a) => {
+      try {
+        const s = await api.accountSummary(a.id);
+        if (alive) setSummaries((prev) => ({ ...prev, [a.id]: s }));
+      } catch {
+        /* ignore */
+      }
+    });
+    return () => {
+      alive = false;
+    };
+  }, [accounts]);
 
   const submit = async () => {
     if (!form.name.trim() || !form.market.trim()) {
@@ -86,11 +109,12 @@ export default function AccountsPage() {
                 {ASSETS.map((a) => <option key={a} value={a}>{ASSET_LABEL[a]} ({a})</option>)}
               </select>
             </Field>
-            <Field label="สัญลักษณ์ (market)">
+            <Field label="คู่เทรด (symbol)">
               <input value={form.market} onChange={(e) => setForm({ ...form, market: e.target.value })}
                 placeholder="เช่น BTCUSDT" className="inp" />
             </Field>
           </div>
+          <p className="mt-2 text-[11px] text-muted">{PAIR_HINT[form.broker] || ""} · แสดงผลตามสกุลของคู่ (ลงท้าย USDT→USDT, THB→บาท)</p>
           <div className="mt-3 flex items-center gap-2">
             <button onClick={submit} disabled={busy} className="chip border-accent-green/30 bg-accent-green/10 text-accent-green disabled:opacity-50">
               {busy ? "กำลังเพิ่ม…" : "บันทึกบัญชี"}
@@ -131,6 +155,8 @@ export default function AccountsPage() {
                   {a.status === "active" ? "ทำงานอยู่" : a.status}
                 </span>
               </div>
+              {summaries[a.id] && <AccountSummaryLine s={summaries[a.id]} />}
+
               <div className="mt-3 flex items-center justify-between">
                 <span className="text-[11px] text-muted">สร้างเมื่อ {a.created_at || "—"}</span>
                 {active ? (
@@ -190,5 +216,53 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <span className="mb-1 block text-[11px] text-muted">{label}</span>
       {children}
     </label>
+  );
+}
+
+const n2 = (v: any) => (v === null || v === undefined ? "—" : Number(v).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+// สรุปสด บนการ์ดบัญชี — รองรับทั้ง MT5 (ทอง) และ Binance (คริปโต)
+function AccountSummaryLine({ s }: { s: any }) {
+  if (s?.kind === "binance") {
+    if (!s.connected) {
+      return (
+        <div className="mt-3 rounded-lg border border-white/[0.06] bg-black/20 p-2.5 text-[11px]">
+          <span className="text-accent-red">ยังเชื่อม Binance ไม่ได้</span>
+          <span className="block text-muted">{s.error || "ตรวจสอบ API key ใน .env"}</span>
+        </div>
+      );
+    }
+    const q = s.quote || "USDT";
+    return (
+      <div className="mt-3 grid grid-cols-3 gap-2 rounded-lg border border-white/[0.06] bg-black/20 p-2.5 text-center">
+        <Cell label={`ยอด (${q})`} value={n2(s.balance)} tone="text-white" />
+        <Cell label="กำไรลอยตัว" value={`${(s.unrealized_pnl ?? 0) >= 0 ? "+" : ""}${n2(s.unrealized_pnl)}`}
+          tone={(s.unrealized_pnl ?? 0) >= 0 ? "text-accent-green" : "text-accent-red"} />
+        <Cell label={`ราคา ${s.symbol}`} value={n2(s.price)} tone="text-accent-cyan" />
+        <div className="col-span-3 mt-1 text-[10px] text-muted">
+          {s.testnet ? "🧪 Testnet · " : ""}โพซิชันเปิด {s.positions?.length || 0} รายการ {s.positions?.length ? `(${s.positions.map((p: any) => p.side).join(", ")})` : ""}
+        </div>
+      </div>
+    );
+  }
+  // MT5 (บัญชีเซนต์)
+  return (
+    <div className="mt-3 grid grid-cols-3 gap-2 rounded-lg border border-white/[0.06] bg-black/20 p-2.5 text-center">
+      <Cell label="ยอดเงิน" value={n2(s.balance)} tone="text-white" />
+      <Cell label="กำไรเทรดจริง" value={`${(s.trade_realized ?? 0) >= 0 ? "+" : ""}${n2(s.trade_realized)}`}
+        tone={(s.trade_realized ?? 0) >= 0 ? "text-accent-green" : "text-accent-red"} />
+      <Cell label="วันนี้" value={`${(s.realized_today ?? 0) >= 0 ? "+" : ""}${n2(s.realized_today)}`}
+        tone={(s.realized_today ?? 0) >= 0 ? "text-accent-green" : "text-accent-red"} />
+      <div className="col-span-3 mt-1 text-[10px] text-muted">บัญชีเซนต์ · ตัวเลขดิบเท่า MT5</div>
+    </div>
+  );
+}
+
+function Cell({ label, value, tone }: { label: string; value: string; tone: string }) {
+  return (
+    <div>
+      <p className="text-[10px] text-muted">{label}</p>
+      <p className={`font-mono text-sm font-bold ${tone}`}>{value}</p>
+    </div>
   );
 }
