@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { api } from "@/lib/api";
+import { useAccountStore } from "@/store/useAccountStore";
 
 type Metrics = { trades: number; pf: number; net_pnl: number; win_rate: number; month_return: number; dd: number; balance: number };
 type Goal = {
@@ -33,13 +34,20 @@ export default function GoalsPage() {
   const [log, setLog] = useState<LogRow[]>([]);
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(true);
+  const currentId = useAccountStore((st) => st.currentId);
+  const accounts = useAccountStore((st) => st.accounts);
+  const loadAccounts = useAccountStore((st) => st.load);
 
   const load = async () => {
-    try { const r = await api.goals(); setS(r.status); setLog(r.log || []); setErr(""); }
+    try { const r = await api.goals(currentId || undefined); setS(r.status); setLog(r.log || []); setErr(""); }
     catch (e: any) { setErr(e?.message || "โหลดข้อมูลไม่ได้"); }
     finally { setLoading(false); }
   };
-  useEffect(() => { load(); const iv = setInterval(load, 15000); return () => clearInterval(iv); }, []);
+  useEffect(() => { loadAccounts(); }, [loadAccounts]);
+  useEffect(() => { load(); const iv = setInterval(load, 15000); return () => clearInterval(iv); }, [currentId]);
+
+  const acc = accounts.find((a) => a.id === currentId);
+  const assetLabel = acc ? (acc.asset === "crypto" ? "คริปโต" : acc.asset === "gold" ? "ทอง" : acc.asset) : "";
 
   const observing = s?.mode === "observing";
   const gs = s ? GST[s.goal.status] || GST.observing : GST.observing;
@@ -52,7 +60,7 @@ export default function GoalsPage() {
     <div>
       <PageHeader
         title="เป้าหมายบริษัท"
-        subtitle="เป้าเดียวที่ทั้งบริษัทเล็งไปด้วยกัน — โตอย่างมีวินัยภายในเพดานความเสี่ยง (เพดานเสี่ยงมาก่อนเป้าเสมอ)"
+        subtitle={`เป้าหมายของทีม "${acc?.name || "ที่เลือก"}"${assetLabel ? ` (${assetLabel})` : ""} — โตอย่างมีวินัยภายในเพดานความเสี่ยง (แยกตามบัญชี · เพดานเสี่ยงมาก่อนเป้าเสมอ)`}
         action={
           <button onClick={load} className="chip border-white/10 bg-white/[0.03] text-muted hover:text-white">
             <RefreshCw className="h-3.5 w-3.5" /> รีเฟรช
