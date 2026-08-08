@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Brain, Target, Sparkles, AlertTriangle, CheckCircle2, Activity } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { api } from "@/lib/api";
+import { useAccountStore } from "@/store/useAccountStore";
 
 // ---- types (โครงหลวมๆ ตรงกับ /api/agents/brains) ----
 type KPI = Record<string, string | number>;
@@ -35,12 +36,16 @@ export default function HeadquartersPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [err, setErr] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const currentId = useAccountStore((s) => s.currentId);
+  const accounts = useAccountStore((s) => s.accounts);
+  const loadAccounts = useAccountStore((s) => s.load);
 
+  useEffect(() => { loadAccounts(); }, [loadAccounts]);
   useEffect(() => {
     let alive = true;
     const load = async () => {
       try {
-        const [b, r] = await Promise.all([api.brains(), api.reviews()]);
+        const [b, r] = await Promise.all([api.brains(currentId || undefined), api.reviews(currentId || undefined)]);
         if (!alive) return;
         setBrains(b as Brain[]);
         setReviews(r as Review[]);
@@ -54,15 +59,18 @@ export default function HeadquartersPage() {
     load();
     const id = setInterval(load, 10000);
     return () => { alive = false; clearInterval(id); };
-  }, []);
+  }, [currentId]);
+
+  const acc = accounts.find((a) => a.id === currentId);
+  const assetLabel = acc ? (acc.asset === "crypto" ? "คริปโต" : acc.asset === "gold" ? "ทอง" : acc.asset) : "";
 
   const measurable = brains.filter((b) => b.accuracy != null);
 
   return (
     <div>
       <PageHeader
-        title="สำนักงานใหญ่ AI"
-        subtitle="พนักงาน AI 8 ตัว — แต่ละตัวมีความจำ KPI ความแม่นยำ จุดแข็ง จุดอ่อน และวงจรเรียนรู้จากความผิดพลาดของตัวเอง"
+        title={`สำนักงานใหญ่ AI${assetLabel ? ` · ทีม${assetLabel}` : ""}`}
+        subtitle={`พนักงาน AI 8 ตัวของบัญชี "${acc?.name || "ที่เลือก"}" — แต่ละทีม (ทอง/คริปโต) มีสมอง/ความจำ/KPI ของตัวเอง แยกกัน ไม่ปนกัน`}
         action={
           <span className="chip border-accent-green/30 bg-accent-green/10 text-accent-green">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-green" /> วัดผลจริง · อัปเดตทุก 10 วิ
