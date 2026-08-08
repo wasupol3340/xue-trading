@@ -6,6 +6,7 @@ import { GraduationCap, TrendingUp, TrendingDown, RefreshCw, AlertTriangle } fro
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AccountSummaryMT5 } from "@/components/account/AccountSummaryMT5";
 import { api } from "@/lib/api";
+import { useAccountStore } from "@/store/useAccountStore";
 
 type Trade = {
   ticket: number; market: string; side: string; technique: string; technique_name: string;
@@ -27,10 +28,12 @@ export default function ExperiencePage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(true);
+  const currentId = useAccountStore((s) => s.currentId);
+  const loadAccounts = useAccountStore((s) => s.load);
 
   const load = async () => {
     try {
-      const r = await api.experience(80);
+      const r = await api.experience(80, currentId || undefined);
       setTrades(r.trades || []);
       setStats(r.stats || null);
       setErr("");
@@ -40,7 +43,8 @@ export default function ExperiencePage() {
       setLoading(false);
     }
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => { loadAccounts(); }, [loadAccounts]);
+  useEffect(() => { setLoading(true); load(); /* eslint-disable-next-line */ }, [currentId]);
 
   return (
     <div>
