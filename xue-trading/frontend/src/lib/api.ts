@@ -87,7 +87,8 @@ export const api = {
   reviews: () => request<any[]>("/agents/reviews"),
   agentsLive: () => request<any[]>("/agents/live"),
   experience: (limit = 60) => request<any>(`/agents/experience?limit=${limit}`),
-  accountSummary: () => request<any>("/agents/account-summary"),
+  accountSummary: (accountId?: number) =>
+    request<any>(`/agents/account-summary${accountId ? `?account_id=${accountId}` : ""}`),
   accounts: () => request<any>("/agents/accounts"),
   accountsCreate: (p: { name: string; broker: string; asset: string; market: string }) =>
     request<any>(
