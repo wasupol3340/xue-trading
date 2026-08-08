@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ShieldAlert, ShieldCheck, RefreshCw, AlertTriangle, Radar, Brain,
-  CheckCircle2, Bot, Scan,
+  CheckCircle2, Bot, Scan, Activity, Database, Wifi, Send, Wallet,
 } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { api } from "@/lib/api";
@@ -13,10 +13,15 @@ type Ev = {
   id: number; severity: "critical" | "warn"; agent: string; rule: string;
   detail: string; brain_os_note: string; status: string; created_at: string;
 };
+type SystemHealth = {
+  mt5_connected: boolean; account_ok: boolean; db_ok: boolean;
+  telegram_ready: boolean; sim_mode: boolean; mt5_error: string; feed_stall_scans: number;
+};
 type Status = {
   healthy: boolean; open_total: number; open_critical: number; open_warn: number;
   total_events: number; last_scan: number;
   rules: { key: string; th: string; sev: string }[];
+  system?: SystemHealth;
   events: Ev[];
 };
 
@@ -89,6 +94,32 @@ export default function GuardianPage() {
             </div>
           </motion.div>
 
+          {/* live system health */}
+          {s.system && (
+            <div className="glass mt-5 p-4">
+              <h3 className="panel-title mb-3 flex items-center gap-2">
+                <Activity className="h-4 w-4 text-brand" /> สุขภาพระบบ (สด)
+                {s.system.sim_mode && <span className="rounded bg-white/[0.05] px-2 py-0.5 text-[10px] text-muted">โหมดจำลอง</span>}
+              </h3>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <HealthTile icon={<Wifi className="h-4 w-4" />} label="การเชื่อมต่อ MT5"
+                  ok={s.system.mt5_connected} okText="เชื่อมต่ออยู่" badText="หลุด" na={s.system.sim_mode} />
+                <HealthTile icon={<Wallet className="h-4 w-4" />} label="อ่านบัญชี MT5"
+                  ok={s.system.account_ok} okText="อ่านได้" badText="อ่านไม่ได้" na={s.system.sim_mode} />
+                <HealthTile icon={<Database className="h-4 w-4" />} label="ฐานข้อมูล (ความจำ)"
+                  ok={s.system.db_ok} okText="ปกติ" badText="ล่ม" />
+                <HealthTile icon={<Send className="h-4 w-4" />} label="แจ้งเตือน Telegram"
+                  ok={s.system.telegram_ready} okText="พร้อมส่ง" badText="ยังไม่ตั้งค่า" warnIfBad />
+              </div>
+              {!!s.system.mt5_error && !s.system.sim_mode && (
+                <p className="mt-3 text-[11px] text-accent-red">MT5: {s.system.mt5_error}</p>
+              )}
+              <p className="mt-3 text-[11px] text-muted">
+                ทีมเทคนิคเฝ้าอัตโนมัติทุก ~45 วินาทีระหว่างเทรด — ถ้าเจอ MT5 หลุด / ฐานข้อมูลล่ม / ราคาค้าง จะเด้ง Telegram ทันที และปิดเตือนเองเมื่อหายดี
+              </p>
+            </div>
+          )}
+
           {/* rules watched */}
           <div className="glass mt-5 p-4">
             <h3 className="panel-title mb-3 flex items-center gap-2"><Radar className="h-4 w-4 text-brand" /> กฎที่ทีมเทคนิคเฝ้าอยู่ ({s.rules.length})</h3>
@@ -147,6 +178,23 @@ export default function GuardianPage() {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+function HealthTile({ icon, label, ok, okText, badText, na, warnIfBad }: {
+  icon: React.ReactNode; label: string; ok: boolean; okText: string; badText: string;
+  na?: boolean; warnIfBad?: boolean;
+}) {
+  const color = na ? "#8b90a0" : ok ? "#22c55e" : warnIfBad ? "#f0b429" : "#ef4444";
+  const text = na ? "โหมดจำลอง" : ok ? okText : badText;
+  return (
+    <div className="rounded-xl border border-white/[0.06] bg-black/20 p-3">
+      <div className="flex items-center gap-1.5 text-muted">{icon}<span className="text-[11px]">{label}</span></div>
+      <div className="mt-1.5 flex items-center gap-1.5">
+        <span className="h-2 w-2 rounded-full" style={{ background: color }} />
+        <span className="text-sm font-semibold" style={{ color }}>{text}</span>
+      </div>
     </div>
   );
 }
