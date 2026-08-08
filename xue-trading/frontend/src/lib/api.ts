@@ -89,6 +89,11 @@ export const api = {
   experience: (limit = 60) => request<any>(`/agents/experience?limit=${limit}`),
   accountSummary: () => request<any>("/agents/account-summary"),
   accounts: () => request<any>("/agents/accounts"),
+  accountsCreate: (p: { name: string; broker: string; asset: string; market: string }) =>
+    request<any>(
+      `/agents/accounts?name=${encodeURIComponent(p.name)}&broker=${encodeURIComponent(p.broker)}&asset=${encodeURIComponent(p.asset)}&market=${encodeURIComponent(p.market)}`,
+      { method: "POST" }
+    ),
   journal: () => request<any>("/agents/journal"),
   report: () => request<any>("/agents/report"),
   boardroom: () => request<any>("/agents/boardroom"),
